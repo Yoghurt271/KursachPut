@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="875.0" prefWidth="1250.0" style="-fx-background-color: #E3E3E3;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.kursachput.HelloController">
+   <children>
+      <BorderPane prefHeight="875.0" prefWidth="1211.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <left>
+            <Pane fx:id="upMenu" prefHeight="846.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="analitButMenu" mnemonicParsing="false" onAction="#openMenuAnalit" onMouseEntered="#AnalitButMenuStyle" prefHeight="47.0" prefWidth="199.0" style="-fx-background-color: #F5F5F5;" text="Аналитика" />
+                  <Button fx:id="rpoductButMenu" layoutY="47.0" mnemonicParsing="false" onAction="#openMenuProduct" onMouseEntered="#ProductButMenuStyle" prefHeight="47.0" prefWidth="199.0" style="-fx-background-color: #F5F5F5;" text="Товары" />
+                  <Button fx:id="salesButMenu" layoutY="94.0" mnemonicParsing="false" onAction="#openMenuSales" onMouseEntered="#SaleButMenuStyle" prefHeight="47.0" prefWidth="198.0" style="-fx-background-color: #F5F5F5;" text="Продажи" />
+                  <Button fx:id="сompanyButMenu" layoutY="141.0" mnemonicParsing="false" onAction="#openMenuCompany" onMouseEntered="#CompanyButMenuStyle" prefHeight="47.0" prefWidth="199.0" style="-fx-background-color: #F5F5F5;" text="О компании" />
+               </children>
+            </Pane>
+         </left>
+         <top>
+            <Pane prefHeight="83.0" prefWidth="1012.0" style="-fx-background-color: #00B1BD;" BorderPane.alignment="CENTER">
+               <children>
+                  <Pane prefHeight="83.0" prefWidth="200.0" style="-fx-background-color: #00B1BD;">
+                     <children>
+                        <ImageView fitHeight="55.0" fitWidth="97.0" layoutX="59.0" layoutY="15.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@image/Logo.jpg" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </Pane>
+                  <Button fx:id="openCreatePane" layoutX="1182.0" layoutY="12.0" mnemonicParsing="false" onAction="#openMenuCreateElem" prefHeight="60.0" prefWidth="60.0" text="Создать" />
+                  <Button fx:id="bb" layoutX="550.0" layoutY="30.0" mnemonicParsing="false" onAction="#bbb" text="Button" />
+               </children>
+            </Pane>
+         </top>
+         <center>
+            <Group BorderPane.alignment="CENTER">
+               <children>
+                  <Pane fx:id="analit" prefHeight="786.0" prefWidth="1050.0" visible="false">
+                     <children>
+                        <Pane layoutX="20.0" layoutY="20.0">
+                           <children>
+                              <Label fx:id="analitPaneDays" prefHeight="35.0" prefWidth="101.0" text="Сегодня">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="analitPaneDMY" layoutX="347.0" layoutY="8.0" opacity="0.49" prefHeight="20.0" prefWidth="63.0" text="09.11.2023" />
+                              <Pane layoutY="36.0" prefHeight="216.0" prefWidth="415.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                 <children>
+                                    <Pane layoutX="5.0" layoutY="5.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <Label layoutX="4.0" layoutY="14.0" prefHeight="38.0" prefWidth="191.0" text="0,00 Р">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="5.0" layoutY="52.0" opacity="0.41" prefHeight="38.0" prefWidth="191.0" text="Выручка">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <Pane layoutX="210.0" layoutY="5.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <Label layoutX="4.0" layoutY="14.0" prefHeight="38.0" prefWidth="191.0" text="0">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="5.0" layoutY="52.0" opacity="0.41" prefHeight="38.0" prefWidth="191.0" text="Продажи">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <Pane layoutX="5.0" layoutY="110.0" prefHeight="101.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <Label layoutX="4.0" layoutY="14.0" prefHeight="38.0" prefWidth="191.0" text="0,00 Р">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="5.0" layoutY="52.0" opacity="0.41" prefHeight="38.0" prefWidth="191.0" text="Средний чек">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <Pane layoutX="210.0" layoutY="110.0" prefHeight="101.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <Label layoutX="4.0" layoutY="14.0" prefHeight="38.0" prefWidth="191.0" text="0,00 Р">
+                                             <font>
+                                                <Font size="24.0" />
+                                             </font>
+                                          </Label>
+                                          <Label layoutX="5.0" layoutY="52.0" opacity="0.41" prefHeight="38.0" prefWidth="191.0" text="Максимальный чек">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </Pane>
+                           </children>
+                           <padding>
+                              <Insets bottom="1.0" right="1.0" />
+                           </padding>
+                        </Pane>
+                        <Pane layoutX="500.0" layoutY="20.0" prefHeight="282.0" prefWidth="538.0">
+                           <children>
+                              <Label fx:id="analitPaneDays1" layoutX="10.0" layoutY="-3.0" prefHeight="35.0" prefWidth="207.0" text="Выручка по часам">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Label>
+                              <LineChart layoutX="10.0" layoutY="38.0" prefHeight="215.0" prefWidth="505.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                <xAxis>
+                                  <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                  <NumberAxis side="LEFT" />
+                                </yAxis>
+                              </LineChart>
+                           </children>
+                        </Pane>
+                        <Pane layoutX="20.0" layoutY="332.0" prefHeight="440.0" prefWidth="1003.0" style="-fx-border-color: #CFCFCF; -fx-background-color: #F5F5F5;">
+                           <children>
+                              <ScrollPane layoutX="14.0" layoutY="11.0" prefHeight="421.0" prefWidth="978.0" style="-fx-border-color: #CFCFCF;">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="1232.0" />
+                                </content>
+                              </ScrollPane>
+                           </children>
+                        </Pane>
+                        <Label fx:id="analitPaneDays2" layoutX="20.0" layoutY="285.0" prefHeight="35.0" prefWidth="184.0" text="Лидеры продаж">
+                           <font>
+                              <Font size="24.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="1.0" right="1.0" />
+                     </padding>
+                  </Pane>
+                  <Pane fx:id="product" prefHeight="780.0" prefWidth="1032.0">
+                     <children>
+                        <TabPane layoutX="1.0" layoutY="3.0" prefHeight="772.0" prefWidth="1017.0" tabClosingPolicy="UNAVAILABLE">
+                          <tabs>
+                            <Tab text="Напитки">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="743.0" prefWidth="1012.0">
+                                       <children>
+                                          <ScrollPane fx:id="scrolPaneNap" layoutX="1.0" layoutY="-1.0" prefHeight="744.0" prefWidth="1011.0" />
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </Tab>
+                            <Tab text="Закуски">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="683.0" prefWidth="999.0" />
+                              </content>
+                            </Tab>
+                          </tabs>
+                           <padding>
+                              <Insets left="1.0" right="1.0" />
+                           </padding>
+                        </TabPane>
+                     </children>
+                     <padding>
+                        <Insets left="1.0" right="1.0" />
+                     </padding>
+                  </Pane>
+                  <Pane fx:id="sales" prefHeight="780.0" prefWidth="1006.0" visible="false" />
+                  <Pane fx:id="comapny" prefHeight="779.0" prefWidth="1007.0" visible="false" />
+                  <Pane fx:id="CreateElemPane" prefHeight="847.0" prefWidth="1094.0" visible="false">
+                     <children>
+                        <TextField fx:id="TFcreateElemName" layoutX="473.0" layoutY="454.0" promptText="Название товара" />
+                        <Button fx:id="addImage" layoutX="473.0" layoutY="411.0" mnemonicParsing="false" onAction="#addImageForCreatePane" prefHeight="25.0" prefWidth="148.0" text="Загрузить картинку" />
+                        <Pane layoutX="307.0" layoutY="32.0" prefHeight="360.0" prefWidth="480.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                           <children>
+                              <ImageView fx:id="imageCreatePane" fitHeight="360.0" fitWidth="481.0" pickOnBounds="true" preserveRatio="true" />
+                           </children>
+                        </Pane>
+                        <TextField fx:id="TFcreateElemSize" layoutX="473.0" layoutY="488.0" promptText="Объём: 0.25" />
+                        <TextField fx:id="TFcreateElemPrise" layoutX="473.0" layoutY="521.0" promptText="Цена в рублях: 80" />
+                        <TextField fx:id="TFcreateElemKolVo" layoutX="473.0" layoutY="555.0" promptText="Количество" />
+                        <Button fx:id="writinForBD" layoutX="484.0" layoutY="597.0" mnemonicParsing="false" onAction="#SendToServ" prefHeight="31.0" prefWidth="126.0" text="Записать" />
+                     </children>
+                  </Pane>
+               </children>
+            </Group>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
