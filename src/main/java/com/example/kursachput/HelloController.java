@@ -294,6 +294,7 @@ public class HelloController implements Initializable {
         GridPane gridPane = new GridPane();
         gridPane.setPrefSize(987, 1534);
         int j = 0;
+        int k = 0;
 
         for (int i = 1; i <= list.size(); i++) {
 
@@ -302,98 +303,100 @@ public class HelloController implements Initializable {
             double prise = list.get(i - 1).prise;
             Blob image = list.get(i - 1).image;
             int kolVo = list.get(i - 1).kolVo;
+            Pane paneBack = new Pane();
+            paneBack.setPrefSize(247, 307);
 
+            Pane paneMain = new Pane();
+            paneMain.setPrefSize(232, 289);
+            paneMain.setLayoutY(10);
+            paneMain.setLayoutX(8);
+            paneMain.setStyle(
+                    "-fx-padding: 0;" +
+                            "-fx-background-color: #E0E0E0;" +
+                            "-fx-border-color: #CFCFCF;"
+            );
 
-            if (i % 4 != 0) {
-                Pane paneBack = new Pane();
-                paneBack.setPrefSize(247, 307);
+            Label nameNap = new Label();
+            nameNap.setPrefSize(208, 30);
+            nameNap.setStyle("-fx-font-size: 20px;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            nameNap.setText(name);
+            nameNap.setLayoutX(10);
+            nameNap.setLayoutY(185);
 
-                Pane paneMain = new Pane();
-                paneMain.setPrefSize(232, 289);
-                paneMain.setLayoutY(10);
-                paneMain.setLayoutX(8);
-                paneMain.setStyle(
-                        "-fx-padding: 0;" +
-                                "-fx-background-color: #E0E0E0;" +
-                                "-fx-border-color: #CFCFCF;"
-                );
+            Label sizeNap = new Label();
+            sizeNap.setPrefSize(129, 17);
+            sizeNap.setStyle("-fx-font-size: 12px;" +
+                    "-fx-opacity: 0.46;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            sizeNap.setText("Объём: " + size);
+            sizeNap.setLayoutX(50);
+            sizeNap.setLayoutY(215);
 
-                Label nameNap = new Label();
-                nameNap.setPrefSize(208, 30);
-                nameNap.setStyle("-fx-font-size: 20px;" +
-                        "-fx-alignment: BOTTOM_CENTER;");
-                nameNap.setText(name);
-                nameNap.setLayoutX(10);
-                nameNap.setLayoutY(185);
+            Label KolVoNap = new Label();
+            KolVoNap.setPrefSize(154, 17);
+            KolVoNap.setStyle("-fx-font-size: 12px;" +
+                    "-fx-opacity: 0.46;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            KolVoNap.setText("Количество: " + kolVo);
+            KolVoNap.setLayoutX(40);
+            KolVoNap.setLayoutY(235);
 
-                Label sizeNap = new Label();
-                sizeNap.setPrefSize(129, 17);
-                sizeNap.setStyle("-fx-font-size: 12px;" +
-                        "-fx-opacity: 0.46;" +
-                        "-fx-alignment: BOTTOM_CENTER;");
-                sizeNap.setText("Объём: " + size);
-                sizeNap.setLayoutX(50);
-                sizeNap.setLayoutY(215);
+            Label priseNap = new Label();
+            priseNap.setPrefSize(191, 27);
+            priseNap.setStyle("-fx-font-size: 18px;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            priseNap.setText("Цена: " + prise);
+            priseNap.setLayoutX(20);
+            priseNap.setLayoutY(250);
 
-                Label KolVoNap = new Label();
-                KolVoNap.setPrefSize(154, 17);
-                KolVoNap.setStyle("-fx-font-size: 12px;" +
-                        "-fx-opacity: 0.46;" +
-                        "-fx-alignment: BOTTOM_CENTER;");
-                KolVoNap.setText("Количество: " + kolVo);
-                KolVoNap.setLayoutX(40);
-                KolVoNap.setLayoutY(235);
+            byte[] bytes = new byte[0];
+            try {
+                bytes = image.getBytes(1, (int) image.length());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            BufferedImage img;
+            try {
+                img = ImageIO.read(new ByteArrayInputStream(bytes));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-                Label priseNap = new Label();
-                priseNap.setPrefSize(191, 27);
-                priseNap.setStyle("-fx-font-size: 18px;" +
-                        "-fx-alignment: BOTTOM_CENTER;");
-                priseNap.setText("Цена: " + prise);
-                priseNap.setLayoutX(20);
-                priseNap.setLayoutY(250);
-
-                byte[] bytes = new byte[0];
-                try {
-                    bytes = image.getBytes(1, (int) image.length());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                BufferedImage img;
-                try {
-                    img = ImageIO.read(new ByteArrayInputStream(bytes));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                WritableImage wr = null;
-                if (img != null) {
-                    wr = new WritableImage(img.getWidth(), img.getHeight());
-                    PixelWriter pw = wr.getPixelWriter();
-                    for (int x = 0; x < img.getWidth(); x++) {
-                        for (int y = 0; y < img.getHeight(); y++) {
-                            pw.setArgb(x, y, img.getRGB(x, y));
-                        }
+            WritableImage wr = null;
+            if (img != null) {
+                wr = new WritableImage(img.getWidth(), img.getHeight());
+                PixelWriter pw = wr.getPixelWriter();
+                for (int x = 0; x < img.getWidth(); x++) {
+                    for (int y = 0; y < img.getHeight(); y++) {
+                        pw.setArgb(x, y, img.getRGB(x, y));
                     }
                 }
+            }
 
-                StackPane paneForImage = new StackPane();
-                paneForImage.setPrefSize(244,174);
+            StackPane paneForImage = new StackPane();
+            paneForImage.setPrefSize(244,174);
 
-                ImageView imView = new ImageView(wr);
-                imView.setPreserveRatio(true);
-                imView.setFitWidth(244);
-                imView.setFitHeight(174);
+            ImageView imView = new ImageView(wr);
+            imView.setPreserveRatio(true);
+            imView.setFitWidth(244);
+            imView.setFitHeight(174);
 
-                paneForImage.getChildren().add(imView);
-                paneForImage.setAlignment(imView, Pos.TOP_CENTER);
+            paneForImage.getChildren().add(imView);
+            paneForImage.setAlignment(imView, Pos.TOP_CENTER);
 
-                paneMain.getChildren().addAll(nameNap, sizeNap, KolVoNap, priseNap, paneForImage);
+            paneMain.getChildren().addAll(nameNap, sizeNap, KolVoNap, priseNap, paneForImage);
 
-                paneBack.getChildren().add(paneMain);
+            paneBack.getChildren().add(paneMain);
 
-                gridPane.add(paneBack, i, j);
-            } else if (i % 4 == 0) {
+            if (i % 5 != 0) {
+                gridPane.add(paneBack, k, j);
+                k++;
+            } else if (i % 5 == 0) {
                 j++;
+                k = 0;
+                gridPane.add(paneBack, k, j);
+
             }
 
 
