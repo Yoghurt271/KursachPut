@@ -656,6 +656,7 @@ public class HelloController implements Initializable {
 
         String lastName = CBProduct.getValue().toString();
         String table = "";
+        int a;
 
         if(CBTypeTov.getValue().equals("Напиток")){
             table = "ProductNap";
