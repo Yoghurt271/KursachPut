@@ -37,13 +37,12 @@
                <children>
                   <Pane prefHeight="83.0" prefWidth="200.0" style="-fx-background-color: #00B1BD;">
                      <children>
-                        <ImageView fitHeight="78.0" fitWidth="89.0" layoutX="59.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fitHeight="78.0" fitWidth="83.0" layoutX="59.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@image/Logo%20(1).png" />
+                              <Image url="@image/Lo.png" />
                            </image>
                         </ImageView>
-                     </children>
-                  </Pane>
+                     </children></Pane>
                   <Button fx:id="openCreatePane" layoutX="1157.0" layoutY="10.0" mnemonicParsing="false" onAction="#openMenuCreateElem" prefHeight="60.0" prefWidth="60.0" style="-fx-background-color: #00B1BD;">
                      <graphic>
                         <ImageView fitHeight="56.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
