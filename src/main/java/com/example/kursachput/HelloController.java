@@ -59,7 +59,23 @@ public class HelloController implements Initializable {
             }
         }
     }
-
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            connection = DriverManager.getConnection(url, user, password);
+            System.out.println("Подключение к базе данных успешно установлено!");
+            uploadElements();
+            fiilGridTable();
+            fillCB();
+            fillVidForProductCreatePane();
+            for (int i = 0; i < listVidNap.size(); i++){
+                CBcreteElemVid.getItems().add(listVidNap.get(i));
+            }
+        } catch (SQLException e) {
+            System.out.println("Ошибка при подключении к базе данных:");
+            printSQLException(e);
+        }
+    }
     //endregion
 
     //region CreateElements
@@ -67,36 +83,498 @@ public class HelloController implements Initializable {
     private BorderPane changePane;
 
     @FXML
-    private Pane upMenu, analit, product, sales, comapny, CreateElemPane, paneEdit;
+    private Pane analit, product, comapny, CreateElemPane, paneEdit, paneForCreateElements,paneForCreateVid;
 
     @FXML
-    private GridPane gridNap;
-
-    @FXML
-    private Button analitButMenu, rpoductButMenu, salesButMenu, сompanyButMenu,
-            openCreatePane, addImage, bb, openEditPane, loadPr, addImageEdit, editForBD, deleteBut;
+    private Button analitButMenu, rpoductButMenu, salesButMenu, сompanyButMenu,createVidNapBut,
+            openCreatePane, addImage, bb, openEditPane, loadPr, addImageEdit, editForBD, deleteBut, deleteVidBut;
 
     @FXML
     private ImageView imageCreatePane, imageEditPane;
 
     @FXML
     private TextField TFcreateElemName, TFcreateElemSize, TFcreateElemPrise, TFcreateElemKolVo,
-            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo;
+            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap;
 
     @FXML
     private ScrollPane scrolPaneNap, scrolPaneZak;
 
     @FXML
-    private AnchorPane anchorPaneNap;
+    private AnchorPane salePane;
+
 
     @FXML
-    private ComboBox ComBox, CBTypeTov, CBProduct;
+    private ComboBox ComBox, CBTypeTov, CBProduct, CBcreteElemVid, choiceWhatsCreate, CBVidProdFromEdit, VidDeleteEdit, CBTypeTov1;
 
     ArrayList<ObjectProd> list = new ArrayList<ObjectProd>();
 
     ArrayList<ObjectProd> listZak = new ArrayList<ObjectProd>();
 
+    ArrayList<String> listVidNap = new ArrayList<>();
+    ArrayList<String> listVidZak = new ArrayList<>();
+
     //endregion
+    @FXML
+    protected void SendToServ() {
+        String x = String.valueOf(ComBox.getValue());
+        if(x.equals("Напиток") && CreateElemPane.isVisible()){
+            SendNapOrZak("ProductNap");
+        }
+        else{
+            SendNapOrZak("ProductZak");
+        }
+
+
+    }
+
+    public void SendNapOrZak(String tableName){
+
+        String prodName = null;
+        double prodSize = 0;
+        double prodPrise = 0;
+        int prodKolVo = 0;
+        String prodVid = null;
+        FileInputStream fis = null;
+
+
+        try {
+            prodName = TFcreateElemName.getText();
+            prodSize = Double.parseDouble(TFcreateElemSize.getText());
+            prodPrise = Double.parseDouble(TFcreateElemPrise.getText());
+            prodKolVo = Integer.parseInt(TFcreateElemKolVo.getText());
+            fis = new FileInputStream(selectedFile);
+            prodVid = CBcreteElemVid.getValue().toString();
+
+        } catch (Exception e) {
+            System.out.println("Ошибка в записи");
+        }
+
+
+        try {
+            String quary = "insert " + tableName + " values (?,?,?,?,?,?);";
+            PreparedStatement preparedStatement = connection.prepareStatement(quary);
+            preparedStatement.setString(1, prodName);
+            preparedStatement.setDouble(2, prodSize);
+            preparedStatement.setDouble(3, prodPrise);
+            preparedStatement.setBlob(4, fis);
+            preparedStatement.setInt(5, prodKolVo);
+            preparedStatement.setString(6, prodVid);
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+    }
+
+    @FXML
+    protected void addImageForCreatePane() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+        selectedFile = fileChooser.showOpenDialog(null);
+        if (selectedFile != null) {
+            Image image = new Image(selectedFile.toURI().toString());
+            if(changePane.isVisible())
+            {
+                imageEditPane.setImage(image);
+                editImagePozition(imageEditPane);
+            }else {
+                imageCreatePane.setImage(image);
+                editImagePozition(imageCreatePane);
+            }
+
+        }
+
+
+    }
+
+    public void fillCB(){
+        ComBox.getItems().addAll("Напиток", "Закуска");
+        ComBox.getSelectionModel().select("Напиток");
+        CBTypeTov.getItems().addAll("Напиток", "Закуска");
+        CBTypeTov.getSelectionModel().select("Напиток");
+        CBTypeTov1.getItems().addAll("Напиток", "Закуска");
+        CBTypeTov1.getSelectionModel().select("Напиток");
+
+        for (int i = 0; i < list.size(); i++) {
+            CBProduct.getItems().addAll(list.get(i).name);
+        }
+
+        choiceWhatsCreate.getItems().addAll("Товар","Вид напитка", "Вид закуски");
+        choiceWhatsCreate.getSelectionModel().select("Товар");
+
+    }
+
+    @FXML
+    protected void choiceFillCB() {
+
+        if(CBTypeTov.getValue().equals("Напиток")) {
+            CBProduct.getItems().clear();
+            for (int i = 0; i < list.size(); i++) {
+                CBProduct.getItems().addAll(list.get(i).name);
+            }
+        }
+        else {
+            CBProduct.getItems().clear();
+            for (int i = 0; i < listZak.size(); i++) {
+                    CBProduct.getItems().addAll(listZak.get(i).name);
+            }
+        }
+    }
+
+    @FXML
+    public void choiceFillCBUp() {
+
+        if(CBTypeTov1.getValue().equals("Напиток")) {
+            VidDeleteEdit.getItems().clear();
+            for (int i = 0; i < listVidNap.size(); i++) {
+                VidDeleteEdit.getItems().add(listVidNap.get(i));
+            }
+        }
+        else {
+            VidDeleteEdit.getItems().clear();
+            for (int i = 0; i < listVidZak.size(); i++) {
+                VidDeleteEdit.getItems().add(listVidZak.get(i));
+            }
+        }
+    }
+
+    public void fillVidForProductCreatePane(){
+        String query = "SELECT * FROM vidNapTable";
+        String queryZak = "SELECT * FROM vidZakTable";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                listVidNap.add(resultSet.getString(1));
+            }
+
+            ResultSet rs = statement.executeQuery(queryZak);
+            while (rs.next()) {
+                listVidZak.add(rs.getString(1));
+            }
+        } catch (Exception ex) {
+            System.out.println("Connection failed...");
+            System.out.println(ex);
+        }
+
+
+    }
+    @FXML
+    protected void createVid() {
+        if(choiceWhatsCreate.getValue().equals("Товар")) {
+            paneForCreateElements.setVisible(true);
+            paneForCreateVid.setVisible(false);
+        }else if(choiceWhatsCreate.getValue().equals("Вид напитка")){
+            paneForCreateElements.setVisible(false);
+            paneForCreateVid.setVisible(true);
+            TFCreateVidNap.setPromptText("Вид напитка");
+        }else {
+            paneForCreateElements.setVisible(false);
+            paneForCreateVid.setVisible(true);
+            TFCreateVidNap.setPromptText("Вид закуски");
+        }
+
+    }
+    @FXML
+    protected void createVidNapBut() {
+        String prodName = null;
+        String tableName = null;
+
+        if(choiceWhatsCreate.getValue().equals("Вид напитка")){
+            tableName = "vidNapTable";
+        }else {
+            tableName = "vidZakTable";
+        }
+
+        try {
+            prodName = TFCreateVidNap.getText();
+
+        } catch (Exception e) {
+            System.out.println("Ошибка в записи");
+        }
+
+
+        try {
+            String quary = "insert " + tableName + " values (?);";
+            PreparedStatement preparedStatement = connection.prepareStatement(quary);
+            preparedStatement.setString(1, prodName);
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+    }
+
+    public void uploadElements() {
+        String query = "SELECT * FROM ProductNap";
+        String queryZak = "SELECT * FROM ProductZak";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                list.add(new ObjectProd(resultSet.getString(1), resultSet.getDouble(2), resultSet.getDouble(3),
+                        resultSet.getBlob(4), resultSet.getInt(5), resultSet.getString(6)));
+            }
+
+            ResultSet rs = statement.executeQuery(queryZak);
+            while (rs.next()) {
+                listZak.add(new ObjectProd(rs.getString(1), rs.getDouble(2), rs.getDouble(3),
+                        rs.getBlob(4), rs.getInt(5), rs.getString(6)));
+            }
+        } catch (Exception ex) {
+            System.out.println("Connection failed...");
+            System.out.println(ex);
+        }
+    }
+
+    @FXML
+    protected void bbb() {
+        list.clear();
+        listZak.clear();
+        listVidNap.clear();
+        listVidZak.clear();
+        uploadElements();
+        fiilGridTable();
+        choiceFillCB();
+        fillVidForProductCreatePane();
+    }
+    @FXML
+    protected void valueTFSize() {
+        if(ComBox.getValue().equals("Напиток")){
+            CBcreteElemVid.getItems().clear();
+            TFcreateElemSize.setPromptText("Объём: 0.25");
+            for (int i = 0; i < listVidNap.size(); i++){
+                CBcreteElemVid.getItems().add(listVidNap.get(i));
+            }
+        }
+        else {
+            TFcreateElemSize.setPromptText("Вес в кг: 0.25");
+            CBcreteElemVid.getItems().clear();
+            for (int i = 0; i < listVidZak.size(); i++){
+                CBcreteElemVid.getItems().add(listVidZak.get(i));
+            }
+        }
+    }
+
+    @FXML
+    protected void loadProduct() {
+
+        String nameProd = CBProduct.getValue().toString();
+        double sizeProd = 0;
+        double priseProd = 0;
+        int kolVoProd = 0;
+        Blob imageProd = null;
+        String vidProd = null;
+
+        for (int i = 0; i < listVidNap.size(); i++)
+        {
+            CBVidProdFromEdit.getItems().add(listVidNap.get(i));
+        }
+
+        for (int i = 0; i < listVidZak.size(); i++)
+        {
+            CBVidProdFromEdit.getItems().add(listVidZak.get(i));
+        }
+
+
+
+        if(CBTypeTov.getValue().equals("Напиток")){
+            for(int i = 0; i < list.size(); i++){
+                if(list.get(i).name.equals(nameProd)){
+                    sizeProd = list.get(i).size;
+                    priseProd = list.get(i).prise;
+                    kolVoProd = list.get(i).kolVo;
+                    imageProd = list.get(i).image;
+                    vidProd = list.get(i).vid;
+                    break;
+                }
+            }
+        }
+        else {
+            for(int i = 0; i < listZak.size(); i++){
+                if(listZak.get(i).name.equals(nameProd)){
+                    sizeProd = listZak.get(i).size;
+                    priseProd = listZak.get(i).prise;
+                    kolVoProd = listZak.get(i).kolVo;
+                    imageProd = listZak.get(i).image;
+                    vidProd = listZak.get(i).vid;
+                    break;
+                }
+            }
+        }
+
+        TFeditElemName.setText(nameProd);
+        TFeditElemSize.setText(String.valueOf(sizeProd));
+        TFeditElemPrise.setText(String.valueOf(priseProd));
+        TFeditElemKolVo.setText(String.valueOf(kolVoProd));
+        imageEditPane.setImage(decodeImage(imageProd));
+        editImagePozition(imageEditPane);
+        CBVidProdFromEdit.setValue(vidProd);
+
+        paneEdit.setDisable(false);
+    }
+
+    @FXML
+    protected void editProdBut() {
+        String prodName = null;
+        String lastName = CBProduct.getValue().toString();
+        double prodSize = 0;
+        double prodPrise = 0;
+        int prodKolVo = 0;
+        FileInputStream fis = null;
+        Blob imageProd = null;
+        String prodVid = null;
+
+        if(CBTypeTov.getValue().equals("Напиток")){
+            for(int i = 0; i < list.size(); i++){
+                if(list.get(i).name.equals(lastName)){
+                    imageProd = list.get(i).image;
+                    break;
+                }
+            }
+        }
+        else {
+            for(int i = 0; i < listZak.size(); i++){
+                if(listZak.get(i).name.equals(lastName)){
+                    imageProd = listZak.get(i).image;
+                    break;
+                }
+            }
+        }
+
+
+        String table = "";
+        if(CBTypeTov.getValue().equals("Напиток")){
+            table = "ProductNap";
+        }else {
+            table = "ProductZak";
+        }
+        PreparedStatement preparedStatement = null;
+
+        try {
+            prodName = TFeditElemName.getText();
+            prodSize = Double.parseDouble(TFeditElemSize.getText());
+            prodPrise = Double.parseDouble(TFeditElemPrise.getText());
+            prodKolVo = Integer.parseInt(TFeditElemKolVo.getText());
+            prodVid = CBVidProdFromEdit.getValue().toString();
+
+            
+
+        } catch (Exception e) {
+            System.out.println("Ошибка в записи");
+        }
+
+        try {
+            fis = new FileInputStream(selectedFile);
+        } catch (Exception e) {
+        }
+
+        try {
+
+            if (CBTypeTov.getValue().equals("Напиток")) {
+                String quary = "UPDATE "+table+" SET nameNap = ?, sizeNap = ?, priseNap = ?, imageNap = ?, kolvo = ?, vidNap = ?  WHERE nameNap = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary);
+            } else {
+                String quary2 = "UPDATE "+table+" SET nameZak = ?, sizeZak = ?, priseZak = ?, imageZak = ?, kolvoZak = ?, vidZak = ?  WHERE nameZak = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary2);
+            }
+            preparedStatement.setString(1, prodName);
+            preparedStatement.setDouble(2, prodSize);
+            preparedStatement.setDouble(3, prodPrise);
+            if(fis != null){
+                preparedStatement.setBlob(4, fis);
+            }else {
+                preparedStatement.setBlob(4, imageProd);
+            }
+            preparedStatement.setInt(5, prodKolVo);
+            preparedStatement.setString(6, prodVid);
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+        paneEdit.setDisable(true);
+    }
+    @FXML
+    protected void deleteBut() {
+
+        String lastName = CBProduct.getValue().toString();
+        String table = "";
+
+        if(CBTypeTov.getValue().equals("Напиток")){
+            table = "ProductNap";
+        }else {
+            table = "ProductZak";
+        }
+
+        PreparedStatement preparedStatement = null;
+
+        try {
+
+            if (CBTypeTov.getValue().equals("Напиток")) {
+                String quary = "DELETE FROM "+table+" WHERE nameNap = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary);
+            } else {
+                String quary2 = "DELETE FROM "+table+" WHERE nameZak = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary2);
+            }
+
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+        paneEdit.setDisable(true);
+    }
+
+    @FXML
+    protected void deleteBut2() {
+
+        String lastName = VidDeleteEdit.getValue().toString();
+        String table = "";
+
+        if(CBTypeTov1.getValue().equals("Напиток")){
+            table = "vidNapTable";
+        }else {
+            table = "vidZakTable";
+        }
+
+        PreparedStatement preparedStatement = null;
+
+        try {
+
+            if (CBTypeTov1.getValue().equals("Напиток")) {
+                String quary = "DELETE FROM "+table+" WHERE vidNapChoice = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary);
+            } else {
+                String quary2 = "DELETE FROM "+table+" WHERE vidZakChoice = '" + lastName + "'";
+                preparedStatement = connection.prepareStatement(quary2);
+            }
+
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+        paneEdit.setDisable(true);
+    }
 
     //region StyleButton
     @FXML
@@ -134,7 +612,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(true);
         product.setVisible(false);
-        sales.setVisible(false);
+        salePane.setVisible(false);
         comapny.setVisible(false);
         CreateElemPane.setVisible(false);
         changePane.setVisible(false);
@@ -146,7 +624,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(false);
         product.setVisible(true);
-        sales.setVisible(false);
+        salePane.setVisible(false);
         comapny.setVisible(false);
         CreateElemPane.setVisible(false);
         changePane.setVisible(false);
@@ -157,7 +635,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(false);
         product.setVisible(false);
-        sales.setVisible(true);
+        salePane.setVisible(true);
         comapny.setVisible(false);
         CreateElemPane.setVisible(false);
         changePane.setVisible(false);
@@ -168,7 +646,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(false);
         product.setVisible(false);
-        sales.setVisible(false);
+        salePane.setVisible(false);
         comapny.setVisible(true);
         CreateElemPane.setVisible(false);
         changePane.setVisible(false);
@@ -179,7 +657,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(false);
         product.setVisible(false);
-        sales.setVisible(false);
+        salePane.setVisible(false);
         comapny.setVisible(false);
         CreateElemPane.setVisible(true);
         changePane.setVisible(false);
@@ -190,7 +668,7 @@ public class HelloController implements Initializable {
 
         analit.setVisible(false);
         product.setVisible(false);
-        sales.setVisible(false);
+        salePane.setVisible(false);
         comapny.setVisible(false);
         CreateElemPane.setVisible(false);
         changePane.setVisible(true);
@@ -198,205 +676,7 @@ public class HelloController implements Initializable {
 
     //endregion
 
-    @FXML
-    protected void SendToServ() {
-        String x = String.valueOf(ComBox.getValue());
-        if(x.equals("Напиток") && CreateElemPane.isVisible()){
-            SendNapOrZak("ProductNap");
-        }
-        else{
-            SendNapOrZak("ProductZak");
-        }
-
-
-    }
-
-    public void SendNapOrZak(String tableName){
-
-        String prodName = null;
-        double prodSize = 0;
-        double prodPrise = 0;
-        int prodKolVo = 0;
-        FileInputStream fis = null;
-
-
-        try {
-            prodName = TFcreateElemName.getText();
-            prodSize = Double.parseDouble(TFcreateElemSize.getText());
-            prodPrise = Double.parseDouble(TFcreateElemPrise.getText());
-            prodKolVo = Integer.parseInt(TFcreateElemKolVo.getText());
-            fis = new FileInputStream(selectedFile);
-        } catch (Exception e) {
-            System.out.println("Ошибка в записи");
-        }
-
-
-        try {
-            String quary = "insert " + tableName + " values (?,?,?,?,?);";
-            PreparedStatement preparedStatement = connection.prepareStatement(quary);
-            preparedStatement.setString(1, prodName);
-            preparedStatement.setDouble(2, prodSize);
-            preparedStatement.setDouble(3, prodPrise);
-            preparedStatement.setBlob(4, fis);
-            preparedStatement.setInt(5, prodKolVo);
-
-
-            int rows = preparedStatement.executeUpdate();
-            System.out.println("Успешно");
-        } catch (SQLException e) {
-            System.out.println("Неуспешно");
-            printSQLException(e);
-        }
-
-    }
-
-    @FXML
-    protected void addImageForCreatePane() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
-        selectedFile = fileChooser.showOpenDialog(null);
-        if (selectedFile != null) {
-            Image image = new Image(selectedFile.toURI().toString());
-            if(changePane.isVisible())
-            {
-                imageEditPane.setImage(image);
-                editImagePozition(imageEditPane);
-            }else {
-                imageCreatePane.setImage(image);
-                editImagePozition(imageCreatePane);
-            }
-
-        }
-
-
-    }
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        try {
-            connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Подключение к базе данных успешно установлено!");
-            uploadElements();
-            fiilGridTable();
-            fillCB();
-        } catch (SQLException e) {
-            System.out.println("Ошибка при подключении к базе данных:");
-            printSQLException(e);
-        }
-    }
-
-    public void fillCB(){
-        ComBox.getItems().addAll("Напиток", "Закуска");
-        ComBox.getSelectionModel().select("Напиток");
-        CBTypeTov.getItems().addAll("Напиток", "Закуска");
-        CBTypeTov.getSelectionModel().select("Напиток");
-
-        for (int i = 0; i < list.size(); i++) {
-            CBProduct.getItems().addAll(list.get(i).name);
-        }
-
-    }
-
-    @FXML
-    protected void choiceFillCB() {
-        if(CBTypeTov.getValue().equals("Напиток")) {
-            CBProduct.getItems().clear();
-            for (int i = 0; i < list.size(); i++) {
-                CBProduct.getItems().addAll(list.get(i).name);
-
-            }
-        }else {
-            CBProduct.getItems().clear();
-            for (int i = 0; i < listZak.size(); i++) {
-                CBProduct.getItems().addAll(listZak.get(i).name);
-
-            }
-        }
-    }
-
-    public void uploadElements() {
-        String query = "SELECT * FROM ProductNap";
-        String queryZak = "SELECT * FROM ProductZak";
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            while (resultSet.next()) {
-                list.add(new ObjectProd(resultSet.getString(1), resultSet.getDouble(2), resultSet.getDouble(3),
-                        resultSet.getBlob(4), resultSet.getInt(5)));
-            }
-
-            ResultSet rs = statement.executeQuery(queryZak);
-            while (rs.next()) {
-                listZak.add(new ObjectProd(rs.getString(1), rs.getDouble(2), rs.getDouble(3),
-                        rs.getBlob(4), rs.getInt(5)));
-            }
-        } catch (Exception ex) {
-            System.out.println("Connection failed...");
-            System.out.println(ex);
-        }
-    }
-
-    @FXML
-    protected void bbb() {
-        list.clear();
-        listZak.clear();
-        uploadElements();
-        fiilGridTable();
-        choiceFillCB();
-    }
-    @FXML
-    protected void valueTFSize() {
-        if(ComBox.getValue().equals("Напиток")){
-            TFcreateElemSize.setPromptText("Объём: 0.25");
-        }
-        else {
-            TFcreateElemSize.setPromptText("Вес в кг: 0.25");
-        }
-    }
-
-    @FXML
-    protected void loadProduct() {
-
-        String nameProd = CBProduct.getValue().toString();
-        double sizeProd = 0;
-        double priseProd = 0;
-        int kolVoProd = 0;
-        Blob imageProd = null;
-        if(CBTypeTov.getValue().equals("Напиток")){
-            for(int i = 0; i < list.size(); i++){
-                if(list.get(i).name.equals(nameProd)){
-                    sizeProd = list.get(i).size;
-                    priseProd = list.get(i).prise;
-                    kolVoProd = list.get(i).kolVo;
-                    imageProd = list.get(i).image;
-                    break;
-                }
-            }
-        }
-        else {
-            for(int i = 0; i < listZak.size(); i++){
-                if(listZak.get(i).name.equals(nameProd)){
-                    sizeProd = listZak.get(i).size;
-                    priseProd = listZak.get(i).prise;
-                    kolVoProd = listZak.get(i).kolVo;
-                    imageProd = listZak.get(i).image;
-                    break;
-                }
-            }
-        }
-
-        TFeditElemName.setText(nameProd);
-        TFeditElemSize.setText(String.valueOf(sizeProd));
-        TFeditElemPrise.setText(String.valueOf(priseProd));
-        TFeditElemKolVo.setText(String.valueOf(kolVoProd));
-        imageEditPane.setImage(decodeImage(imageProd));
-        editImagePozition(imageEditPane);
-
-        paneEdit.setDisable(false);
-    }
-
+    //region Не трогать
     public void fiilGridTable() {
 
         for (int i = 0; i <= 1; i++){
@@ -568,123 +848,5 @@ public class HelloController implements Initializable {
             imageViewEdit.setY((imageViewEdit.getFitHeight() - h) / 2);
         }
     }
-
-    @FXML
-    protected void editProdBut() {
-        String prodName = null;
-        String lastName = CBProduct.getValue().toString();
-        double prodSize = 0;
-        double prodPrise = 0;
-        int prodKolVo = 0;
-        FileInputStream fis = null;
-        Blob imageProd = null;
-
-        if(CBTypeTov.getValue().equals("Напиток")){
-            for(int i = 0; i < list.size(); i++){
-                if(list.get(i).name.equals(lastName)){
-                    imageProd = list.get(i).image;
-                    break;
-                }
-            }
-        }
-        else {
-            for(int i = 0; i < listZak.size(); i++){
-                if(listZak.get(i).name.equals(lastName)){
-                    imageProd = listZak.get(i).image;
-                    break;
-                }
-            }
-        }
-
-
-        String table = "";
-        if(CBTypeTov.getValue().equals("Напиток")){
-            table = "ProductNap";
-        }else {
-            table = "ProductZak";
-        }
-        PreparedStatement preparedStatement = null;
-
-        try {
-            prodName = TFeditElemName.getText();
-            prodSize = Double.parseDouble(TFeditElemSize.getText());
-            prodPrise = Double.parseDouble(TFeditElemPrise.getText());
-            prodKolVo = Integer.parseInt(TFeditElemKolVo.getText());
-
-            
-
-        } catch (Exception e) {
-            System.out.println("Ошибка в записи");
-        }
-
-        try {
-            fis = new FileInputStream(selectedFile);
-        } catch (Exception e) {
-        }
-
-        try {
-
-            if (CBTypeTov.getValue().equals("Напиток")) {
-                String quary = "UPDATE "+table+" SET nameNap = ?, sizeNap = ?, priseNap = ?, imageNap = ?, kolvo = ?  WHERE nameNap = '" + lastName + "'";
-                preparedStatement = connection.prepareStatement(quary);
-            } else {
-                String quary2 = "UPDATE "+table+" SET nameZak = ?, sizeZak = ?, priseZak = ?, imageZak = ?, kolvoZak = ?  WHERE nameZak = '" + lastName + "'";
-                preparedStatement = connection.prepareStatement(quary2);
-            }
-            preparedStatement.setString(1, prodName);
-            preparedStatement.setDouble(2, prodSize);
-            preparedStatement.setDouble(3, prodPrise);
-            if(fis != null){
-                preparedStatement.setBlob(4, fis);
-            }else {
-                preparedStatement.setBlob(4, imageProd);
-            }
-            preparedStatement.setInt(5, prodKolVo);
-
-            int rows = preparedStatement.executeUpdate();
-            System.out.println("Успешно");
-        } catch (SQLException e) {
-            System.out.println("Неуспешно");
-            printSQLException(e);
-        }
-
-        paneEdit.setDisable(true);
-    }
-
-    @FXML
-    protected void deleteBut() {
-
-        String lastName = CBProduct.getValue().toString();
-        String table = "";
-        int a;
-
-        if(CBTypeTov.getValue().equals("Напиток")){
-            table = "ProductNap";
-        }else {
-            table = "ProductZak";
-        }
-
-        PreparedStatement preparedStatement = null;
-
-        try {
-
-            if (CBTypeTov.getValue().equals("Напиток")) {
-                String quary = "DELETE FROM "+table+" WHERE nameNap = '" + lastName + "'";
-                preparedStatement = connection.prepareStatement(quary);
-            } else {
-                String quary2 = "DELETE FROM "+table+" WHERE nameZak = '" + lastName + "'";
-                preparedStatement = connection.prepareStatement(quary2);
-            }
-
-
-            int rows = preparedStatement.executeUpdate();
-            System.out.println("Успешно");
-        } catch (SQLException e) {
-            System.out.println("Неуспешно");
-            printSQLException(e);
-        }
-
-        paneEdit.setDisable(true);
-    }
-
+    //endregion
 }

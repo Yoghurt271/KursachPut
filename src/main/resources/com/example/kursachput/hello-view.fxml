@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.Group?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
@@ -21,7 +20,7 @@
 
 <AnchorPane prefHeight="875.0" prefWidth="1250.0" style="-fx-background-color: #E3E3E3;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.kursachput.HelloController">
    <children>
-      <BorderPane prefHeight="875.0" prefWidth="1211.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane prefHeight="875.0" prefWidth="1250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <left>
             <Pane fx:id="upMenu" prefHeight="846.0" prefWidth="200.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;" BorderPane.alignment="CENTER">
                <children>
@@ -73,9 +72,9 @@
             </Pane>
          </top>
          <center>
-            <Group BorderPane.alignment="CENTER">
+            <Pane>
                <children>
-                  <Pane fx:id="analit" prefHeight="786.0" prefWidth="1050.0" visible="false">
+                  <Pane fx:id="analit" prefHeight="779.0" prefWidth="1029.0" visible="false">
                      <children>
                         <Pane layoutX="20.0" layoutY="20.0">
                            <children>
@@ -186,7 +185,7 @@
                         <Insets left="1.0" right="1.0" />
                      </padding>
                   </Pane>
-                  <Pane fx:id="product" prefHeight="780.0" prefWidth="1043.0" visible="false">
+                  <Pane fx:id="product" prefHeight="778.0" prefWidth="1027.0" visible="false">
                      <children>
                         <TabPane layoutX="1.0" layoutY="3.0" prefHeight="772.0" prefWidth="1017.0" tabClosingPolicy="UNAVAILABLE">
                           <tabs>
@@ -204,7 +203,8 @@
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="683.0" prefWidth="999.0">
                                        <children>
                                           <ScrollPane fx:id="scrolPaneZak" prefHeight="744.0" prefWidth="1014.0" />
-                                       </children></AnchorPane>
+                                       </children>
+                                    </AnchorPane>
                               </content>
                             </Tab>
                           </tabs>
@@ -217,40 +217,119 @@
                         <Insets left="1.0" right="1.0" />
                      </padding>
                   </Pane>
-                  <Pane fx:id="sales" prefHeight="780.0" prefWidth="1045.0" visible="false" />
-                  <Pane fx:id="comapny" prefHeight="779.0" prefWidth="1044.0" visible="false" />
-                  <Pane fx:id="CreateElemPane" prefHeight="778.0" prefWidth="1042.0" visible="false">
+                  <AnchorPane fx:id="salePane" prefHeight="781.0" prefWidth="1044.0" visible="false">
                      <children>
-                        <TextField fx:id="TFcreateElemName" layoutX="464.0" layoutY="478.0" promptText="Название товара" />
-                        <Button fx:id="addImage" layoutX="464.0" layoutY="411.0" mnemonicParsing="false" onAction="#addImageForCreatePane" prefHeight="25.0" prefWidth="148.0" text="Загрузить картинку" />
-                        <Pane layoutX="298.0" layoutY="32.0" prefHeight="360.0" prefWidth="480.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                        <Pane layoutY="342.0" prefHeight="439.0" prefWidth="1051.0">
                            <children>
-                              <ImageView fx:id="imageCreatePane" fitHeight="360.0" fitWidth="481.0" pickOnBounds="true" preserveRatio="true" />
+                              <ScrollPane layoutX="13.0" layoutY="38.0" prefHeight="393.0" prefWidth="1026.0" style="-fx-border-color: #CFCFCF;">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="798.0" prefWidth="1009.0" />
+                                </content>
+                              </ScrollPane>
+                              <Label layoutX="14.0" layoutY="14.0" text="Завершенные заказы" />
                            </children>
                         </Pane>
-                        <TextField fx:id="TFcreateElemSize" layoutX="464.0" layoutY="510.0" promptText="Объём: 0.25" />
-                        <TextField fx:id="TFcreateElemPrise" layoutX="464.0" layoutY="541.0" promptText="Цена в рублях: 80" />
-                        <TextField fx:id="TFcreateElemKolVo" layoutX="464.0" layoutY="573.0" promptText="Количество" />
-                        <Button fx:id="writinForBD" layoutX="475.0" layoutY="607.0" mnemonicParsing="false" onAction="#SendToServ" prefHeight="31.0" prefWidth="126.0" text="Записать" />
-                        <ComboBox fx:id="ComBox" layoutX="463.0" layoutY="447.0" onAction="#valueTFSize" prefWidth="150.0" />
+                        <Pane layoutX="16.0" layoutY="14.0" prefHeight="328.0" prefWidth="489.0">
+                           <children>
+                              <Pane layoutY="25.0" prefHeight="304.0" prefWidth="478.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                 <children>
+                                    <Pane layoutX="6.0" layoutY="5.0" prefHeight="295.0" prefWidth="192.0" style="-fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <ImageView fitHeight="166.0" fitWidth="197.0" layoutX="8.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@image/Lo.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Label alignment="TOP_CENTER" layoutX="2.0" layoutY="185.0" prefHeight="17.0" prefWidth="188.0" text="Название">
+                                             <font>
+                                                <Font size="23.0" />
+                                             </font>
+                                          </Label>
+                                          <TextField layoutX="22.0" layoutY="261.0" promptText="Количество" />
+                                          <Label alignment="TOP_CENTER" layoutX="21.0" layoutY="219.0" prefHeight="17.0" prefWidth="149.0" text="Цена">
+                                             <font>
+                                                <Font size="21.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                    <TextField layoutX="211.0" layoutY="5.0" prefHeight="25.0" prefWidth="253.0" promptText="Поиск" />
+                                    <Pane layoutX="213.0" layoutY="35.0" prefHeight="263.0" prefWidth="250.0" style="-fx-border-color: #CFCFCF;">
+                                       <children>
+                                          <ComboBox layoutX="5.0" layoutY="39.0" prefHeight="25.0" prefWidth="241.0" promptText="Тип" />
+                                          <ComboBox layoutX="6.0" layoutY="104.0" prefHeight="25.0" prefWidth="240.0" promptText="Товар" />
+                                          <Button layoutX="5.0" layoutY="183.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="241.0" text="Добавить" />
+                                          <ComboBox layoutX="5.0" layoutY="71.0" prefHeight="25.0" prefWidth="240.0" promptText="Вид" />
+                                          <Label layoutX="6.0" layoutY="138.0" prefHeight="36.0" prefWidth="239.0" text="Осталось на складе: 50">
+                                             <font>
+                                                <Font size="19.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </Pane>
+                              <Label layoutY="6.0" text="Составить заказ" />
+                           </children>
+                        </Pane>
+                        <Pane layoutX="526.0" layoutY="9.0" prefHeight="334.0" prefWidth="504.0">
+                           <children>
+                              <ScrollPane layoutY="30.0" prefHeight="304.0" prefWidth="504.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="298.0" prefWidth="497.0" />
+                                </content>
+                              </ScrollPane>
+                              <Label layoutX="-1.0" layoutY="14.0" text="Заказ" />
+                           </children>
+                        </Pane>
+                     </children>
+                  </AnchorPane>
+                  <Pane fx:id="comapny" layoutX="-5.0" prefHeight="789.0" prefWidth="1053.0" visible="false" />
+                  <Pane fx:id="CreateElemPane" layoutY="-2.0" prefHeight="794.0" prefWidth="1051.0" visible="false">
+                     <children>
+                        <Pane fx:id="paneForCreateElements" layoutX="298.0" layoutY="54.0">
+                           <children>
+                              <Pane prefHeight="360.0" prefWidth="480.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                                 <children>
+                                    <ImageView fx:id="imageCreatePane" fitHeight="360.0" fitWidth="481.0" pickOnBounds="true" preserveRatio="true" />
+                                 </children>
+                              </Pane>
+                              <Button fx:id="addImage" layoutX="166.0" layoutY="378.0" mnemonicParsing="false" onAction="#addImageForCreatePane" prefHeight="25.0" prefWidth="148.0" text="Загрузить картинку" />
+                              <ComboBox fx:id="ComBox" layoutX="165.0" layoutY="414.0" onAction="#valueTFSize" prefWidth="150.0" />
+                              <TextField fx:id="TFcreateElemName" layoutX="166.0" layoutY="478.0" promptText="Название товара" />
+                              <TextField fx:id="TFcreateElemSize" layoutX="166.0" layoutY="510.0" promptText="Объём: 0.25" />
+                              <TextField fx:id="TFcreateElemPrise" layoutX="166.0" layoutY="541.0" promptText="Цена в рублях: 80" />
+                              <TextField fx:id="TFcreateElemKolVo" layoutX="166.0" layoutY="573.0" promptText="Количество" />
+                              <Button fx:id="writinForBD" layoutX="177.0" layoutY="607.0" mnemonicParsing="false" onAction="#SendToServ" prefHeight="31.0" prefWidth="126.0" text="Записать" />
+                              <ComboBox fx:id="CBcreteElemVid" layoutX="165.0" layoutY="445.0" prefWidth="150.0" promptText="Вид" />
+                           </children>
+                        </Pane>
+                        <ComboBox fx:id="choiceWhatsCreate" layoutX="451.0" layoutY="14.0" onAction="#createVid" prefWidth="150.0" />
+                        <Pane fx:id="paneForCreateVid" layoutX="382.0" layoutY="250.0" prefHeight="247.0" prefWidth="288.0" visible="false">
+                           <children>
+                              <TextField fx:id="TFCreateVidNap" layoutX="70.0" layoutY="111.0" promptText="Вид напитка" />
+                              <Button fx:id="createVidNapBut" layoutX="70.0" layoutY="147.0" mnemonicParsing="false" onAction="#createVidNapBut" prefHeight="25.0" prefWidth="148.0" text="Создать" />
+                           </children>
+                        </Pane>
                      </children>
                   </Pane>
-                  <BorderPane fx:id="changePane" layoutX="10.0" layoutY="9.0" prefHeight="797.0" prefWidth="1053.0">
+                  <BorderPane fx:id="changePane" layoutY="1.0" prefHeight="789.0" prefWidth="1053.0">
                      <center>
                         <Pane fx:id="paneEdit" disable="true" prefHeight="780.0" prefWidth="827.0">
                            <children>
-                              <Pane layoutX="198.0" layoutY="14.0" prefHeight="360.0" prefWidth="480.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
+                              <Pane layoutX="96.0" layoutY="6.0" prefHeight="360.0" prefWidth="480.0" style="-fx-background-color: #F5F5F5; -fx-border-color: #CFCFCF;">
                                  <children>
                                     <ImageView fx:id="imageEditPane" fitHeight="360.0" fitWidth="481.0" pickOnBounds="true" preserveRatio="true" />
                                  </children>
                               </Pane>
-                              <Button fx:id="addImageEdit" layoutX="364.0" layoutY="390.0" mnemonicParsing="false" onAction="#addImageForCreatePane" prefHeight="25.0" prefWidth="148.0" text="Загрузить картинку" />
-                              <TextField fx:id="TFeditElemName" layoutX="364.0" layoutY="425.0" promptText="Название товара" />
-                              <TextField fx:id="TFeditElemSize" layoutX="364.0" layoutY="459.0" promptText="Объём: 0.25" />
-                              <TextField fx:id="TFeditElemPrise" layoutX="364.0" layoutY="493.0" promptText="Цена в рублях: 80" />
-                              <TextField fx:id="TFeditElemKolVo" layoutX="364.0" layoutY="527.0" promptText="Количество" />
-                              <Button fx:id="editForBD" layoutX="375.0" layoutY="562.0" mnemonicParsing="false" onAction="#editProdBut" prefHeight="31.0" prefWidth="126.0" text="Изменить" />
-                              <Button fx:id="deleteBut" layoutX="375.0" layoutY="602.0" mnemonicParsing="false" onAction="#deleteBut" prefHeight="31.0" prefWidth="126.0" text="Удалить" />
+                              <Button fx:id="addImageEdit" layoutX="254.0" layoutY="395.0" mnemonicParsing="false" onAction="#addImageForCreatePane" prefHeight="25.0" prefWidth="148.0" text="Загрузить картинку" />
+                              <TextField fx:id="TFeditElemName" layoutX="254.0" layoutY="461.0" promptText="Название товара" />
+                              <TextField fx:id="TFeditElemSize" layoutX="254.0" layoutY="495.0" promptText="Объём: 0.25" />
+                              <TextField fx:id="TFeditElemPrise" layoutX="254.0" layoutY="529.0" promptText="Цена в рублях: 80" />
+                              <TextField fx:id="TFeditElemKolVo" layoutX="254.0" layoutY="563.0" promptText="Количество" />
+                              <Button fx:id="editForBD" layoutX="265.0" layoutY="598.0" mnemonicParsing="false" onAction="#editProdBut" prefHeight="31.0" prefWidth="126.0" text="Изменить" />
+                              <Button fx:id="deleteBut" layoutX="265.0" layoutY="638.0" mnemonicParsing="false" onAction="#deleteBut" prefHeight="31.0" prefWidth="126.0" text="Удалить" />
+                              <ComboBox fx:id="CBVidProdFromEdit" layoutX="253.0" layoutY="427.0" prefWidth="150.0" />
                            </children>
                         </Pane>
                      </center>
@@ -258,16 +337,27 @@
                         <Pane prefHeight="790.0" prefWidth="197.0" style="-fx-border-color: #CFCFCF;" BorderPane.alignment="CENTER">
                            <children>
                               <ComboBox fx:id="CBTypeTov" layoutX="25.0" layoutY="35.0" onAction="#choiceFillCB" prefWidth="150.0" />
-                              <ComboBox fx:id="CBProduct" layoutX="25.0" layoutY="93.0" prefWidth="150.0" />
+                              <ComboBox fx:id="CBProduct" layoutX="24.0" layoutY="91.0" prefWidth="150.0" />
                               <Label layoutX="25.0" layoutY="14.0" text="Тип товара:" />
-                              <Label layoutX="25.0" layoutY="69.0" text="Товар:" />
+                              <Label layoutX="25.0" layoutY="68.0" text="Товар:" />
                               <Button fx:id="loadPr" layoutX="16.0" layoutY="735.0" mnemonicParsing="false" onAction="#loadProduct" prefHeight="25.0" prefWidth="168.0" text="Загрузить товар" />
                            </children>
                         </Pane>
                      </left>
+                     <right>
+                        <Pane prefHeight="796.0" prefWidth="200.0" style="-fx-border-color: #CFCFCF;" BorderPane.alignment="CENTER">
+                           <children>
+                              <ComboBox fx:id="VidDeleteEdit" layoutX="14.0" layoutY="83.0" prefWidth="150.0" />
+                              <Label layoutX="14.0" layoutY="66.0" text="Вид товара" />
+                              <ComboBox fx:id="CBTypeTov1" layoutX="14.0" layoutY="31.0" onAction="#choiceFillCBUp" prefWidth="150.0" />
+                              <Label layoutX="13.0" layoutY="14.0" text="Тип товара:" />
+                              <Button fx:id="deleteVidBut" layoutX="11.0" layoutY="750.0" mnemonicParsing="false" onAction="#deleteBut2" prefHeight="25.0" prefWidth="180.0" text="Удалить вид" />
+                           </children>
+                        </Pane>
+                     </right>
                   </BorderPane>
                </children>
-            </Group>
+            </Pane>
          </center>
       </BorderPane>
    </children>

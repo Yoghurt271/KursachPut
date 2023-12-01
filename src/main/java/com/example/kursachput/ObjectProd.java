@@ -11,15 +11,16 @@ public class ObjectProd {
     double prise;
     Blob image;
     int kolVo;
+    String vid;
 
 
-    public ObjectProd(String name, double size, double prise, Blob image ,int kolVo){
+    public ObjectProd(String name, double size, double prise, Blob image ,int kolVo, String vid){
         this.name = name;
         this.size = size;
         this.prise = prise;
         this.image = image;
         this.kolVo = kolVo;
-
+        this.vid = vid;
     }
 
 }
