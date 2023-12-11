@@ -1,10 +1,13 @@
 //region ImportLibraris
 package com.example.kursachput;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -19,6 +22,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
 import java.sql.*;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -26,23 +31,18 @@ import javax.imageio.ImageIO;
 
 import java.sql.Connection;
 
-import static java.nio.file.Files.write;
 //endregion
 
 public class HelloController implements Initializable {
 
     //region ConnectToBD
     String url = "jdbc:mysql://192.168.0.179:3306/CursachPutOdMi";
-
     String user = "Yoghurt";
     String password = "Kaka228";
 
     private Connection connection;
 
     public File selectedFile;
-
-    public HelloController() {
-    }
 
     public static void printSQLException(SQLException ex) {
         for (Throwable e : ex) {
@@ -68,6 +68,7 @@ public class HelloController implements Initializable {
             fiilGridTable();
             fillCB();
             fillVidForProductCreatePane();
+            fillTableOrderFinish(listOrderFinish, tbViewFinish, tbCollumnID, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
             for (int i = 0; i < listVidNap.size(); i++){
                 CBcreteElemVid.getItems().add(listVidNap.get(i));
             }
@@ -81,37 +82,41 @@ public class HelloController implements Initializable {
     //region CreateElements
     @FXML
     private BorderPane changePane;
-
     @FXML
     private Pane analit, product, comapny, CreateElemPane, paneEdit, paneForCreateElements,paneForCreateVid;
-
     @FXML
-    private Button analitButMenu, rpoductButMenu, salesButMenu, сompanyButMenu,createVidNapBut,
-            openCreatePane, addImage, bb, openEditPane, loadPr, addImageEdit, editForBD, deleteBut, deleteVidBut;
-
+    private Button analitButMenu, rpoductButMenu, salesButMenu, сompanyButMenu;
     @FXML
-    private ImageView imageCreatePane, imageEditPane;
-
+    private ImageView imageCreatePane, imageEditPane, imgAddFromOrder;
     @FXML
     private TextField TFcreateElemName, TFcreateElemSize, TFcreateElemPrise, TFcreateElemKolVo,
-            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap;
-
+            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap, tfSearchProd,
+            tfAddToOrderkolVo, tfIDdelite;
     @FXML
     private ScrollPane scrolPaneNap, scrolPaneZak;
-
     @FXML
     private AnchorPane salePane;
-
-
     @FXML
-    private ComboBox ComBox, CBTypeTov, CBProduct, CBcreteElemVid, choiceWhatsCreate, CBVidProdFromEdit, VidDeleteEdit, CBTypeTov1;
+    private Label resultSearch, nameFromOrder, priseFromOrder, kolVoFromOrder;
+    @FXML
+    private ComboBox ComBox, CBTypeTov, CBProduct, CBcreteElemVid, choiceWhatsCreate,
+            CBVidProdFromEdit, VidDeleteEdit, CBTypeTov1, CBsalesPaneType, CBsalesPaneVid, CBsalesPaneProd;
+    @FXML
+    private TableView  tbViewOrderStr;
+    @FXML
+    private TableView tbViewFinish;
+    @FXML
+    private TableColumn<ObjectProd,Integer> tbCollumnKolVo, tbCollumnPrise, tbCollumnID, tbNumOrder, tbMidPriseOrder, tbGenPrise;
+    @FXML
+    private TableColumn<ObjectProd,String> tbCollumnName, tbDateAndTimeOrder;
 
     ArrayList<ObjectProd> list = new ArrayList<ObjectProd>();
-
     ArrayList<ObjectProd> listZak = new ArrayList<ObjectProd>();
-
     ArrayList<String> listVidNap = new ArrayList<>();
     ArrayList<String> listVidZak = new ArrayList<>();
+    ObservableList<ObjectOrder> listOrderStruct = FXCollections.observableArrayList();
+    ObservableList<ObjectFinishOrder> listOrderFinish = FXCollections.observableArrayList();
+    String name = null;
 
     //endregion
     @FXML
@@ -124,6 +129,29 @@ public class HelloController implements Initializable {
             SendNapOrZak("ProductZak");
         }
 
+
+    }
+    @FXML
+    protected void fillSearchResult(){
+        String find = tfSearchProd.getText();
+        try {
+            String quary = "SELECT nameNap FROM ProductNap WHERE nameNap LIKE \""+ find +"%\";";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(quary);
+            while(resultSet.next()){
+                name = resultSet.getString(1);
+            }
+            resultSearch.setText(name);
+        } catch (SQLException ignored) { }
+        try {
+            String quary = "SELECT nameZak FROM ProductZak WHERE nameZak LIKE \""+ find +"%\";";
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(quary);
+            while(resultSet.next()){
+                name = resultSet.getString(1);
+            }
+            resultSearch.setText(name);
+        } catch (SQLException ignored) { }
 
     }
 
@@ -148,8 +176,6 @@ public class HelloController implements Initializable {
         } catch (Exception e) {
             System.out.println("Ошибка в записи");
         }
-
-
         try {
             String quary = "insert " + tableName + " values (?,?,?,?,?,?);";
             PreparedStatement preparedStatement = connection.prepareStatement(quary);
@@ -168,7 +194,6 @@ public class HelloController implements Initializable {
         }
 
     }
-
     @FXML
     protected void addImageForCreatePane() {
         FileChooser fileChooser = new FileChooser();
@@ -191,7 +216,6 @@ public class HelloController implements Initializable {
 
 
     }
-
     public void fillCB(){
         ComBox.getItems().addAll("Напиток", "Закуска");
         ComBox.getSelectionModel().select("Напиток");
@@ -199,6 +223,8 @@ public class HelloController implements Initializable {
         CBTypeTov.getSelectionModel().select("Напиток");
         CBTypeTov1.getItems().addAll("Напиток", "Закуска");
         CBTypeTov1.getSelectionModel().select("Напиток");
+        CBsalesPaneType.getItems().addAll("Напиток", "Закуска");
+        CBsalesPaneType.getSelectionModel().select("Напиток");
 
         for (int i = 0; i < list.size(); i++) {
             CBProduct.getItems().addAll(list.get(i).name);
@@ -206,9 +232,55 @@ public class HelloController implements Initializable {
 
         choiceWhatsCreate.getItems().addAll("Товар","Вид напитка", "Вид закуски");
         choiceWhatsCreate.getSelectionModel().select("Товар");
+    }
+    @FXML
+    protected  void loadProdFromOrder(){
+        loadProdFromOrderAll(resultSearch, null);
+    }
+    @FXML
+    protected  void loadProdFromOrderByComBox(){
+        loadProdFromOrderAll(null, CBsalesPaneProd);
+    }
+    public void loadProdFromOrderAll(Label resLabel, ComboBox resComBox){
+
+        try {
+            String nameProd = null;
+            if(resLabel != null){
+                nameProd = resLabel.getText();
+            }else {
+                nameProd = resComBox.getValue().toString();
+            }
+            double priseProd = 0;
+            int kolVoProd = 0;
+            Blob imageProd = null;
+
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).name.equals(nameProd)) {
+                    priseProd = list.get(i).prise;
+                    kolVoProd = list.get(i).kolVo;
+                    imageProd = list.get(i).image;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < listZak.size(); i++) {
+                if (listZak.get(i).name.equals(nameProd)) {
+                    priseProd = listZak.get(i).prise;
+                    kolVoProd = listZak.get(i).kolVo;
+                    imageProd = listZak.get(i).image;
+                    break;
+                }
+            }
+
+
+            nameFromOrder.setText(nameProd);
+            priseFromOrder.setText("Цена: " + priseProd);
+            kolVoFromOrder.setText("Осталось на складе: " + kolVoProd);
+            imgAddFromOrder.setImage(decodeImage(imageProd));
+            editImagePozition(imgAddFromOrder);
+        } catch (Exception ignored) { }
 
     }
-
     @FXML
     protected void choiceFillCB() {
 
@@ -225,24 +297,64 @@ public class HelloController implements Initializable {
             }
         }
     }
-
     @FXML
     public void choiceFillCBUp() {
-
-        if(CBTypeTov1.getValue().equals("Напиток")) {
-            VidDeleteEdit.getItems().clear();
+        fillVidCBfromCBProd(CBTypeTov1, VidDeleteEdit);
+    }
+    public void fillVidCBfromCBProd(ComboBox typeTov, ComboBox vidTov){
+        if(typeTov.getValue().equals("Напиток")) {
+            vidTov.getItems().clear();
             for (int i = 0; i < listVidNap.size(); i++) {
-                VidDeleteEdit.getItems().add(listVidNap.get(i));
+                vidTov.getItems().add(listVidNap.get(i));
             }
         }
         else {
-            VidDeleteEdit.getItems().clear();
+            vidTov.getItems().clear();
             for (int i = 0; i < listVidZak.size(); i++) {
-                VidDeleteEdit.getItems().add(listVidZak.get(i));
+                vidTov.getItems().add(listVidZak.get(i));
             }
         }
     }
+    @FXML
+    protected void salesPaneFillCBVid(){
+        fillVidCBfromCBProd(CBsalesPaneType, CBsalesPaneVid);
+    }
+    @FXML
+    protected void salesPaneFillCBProd(){
+        String vid = null;
+        try {
+            vid = CBsalesPaneVid.getValue().toString();
+        } catch (Exception ignored) {}
 
+        if (CBsalesPaneType.getValue().equals("Напиток")) {
+            CBsalesPaneProd.getItems().clear();
+            for (int i = 0; i<list.size(); i++) {
+
+                while (i<list.size()) {
+                    if (!list.get(i).vid.equals(vid)){
+                        break;
+                    }
+                    CBsalesPaneProd.getItems().add(list.get(i).name);
+                    i++;
+                }
+
+            }
+        }else {
+            CBsalesPaneProd.getItems().clear();
+            for (int i = 0; i<listZak.size(); i++) {
+
+                while (i<listZak.size()) {
+                    if (!listZak.get(i).vid.equals(vid)){
+                        break;
+                    }
+                    CBsalesPaneProd.getItems().add(listZak.get(i).name);
+                    i++;
+                }
+
+            }
+        }
+
+    }
     public void fillVidForProductCreatePane(){
         String query = "SELECT * FROM vidNapTable";
         String queryZak = "SELECT * FROM vidZakTable";
@@ -312,10 +424,10 @@ public class HelloController implements Initializable {
         }
 
     }
-
     public void uploadElements() {
         String query = "SELECT * FROM ProductNap";
         String queryZak = "SELECT * FROM ProductZak";
+        String queryOrder = "SELECT * FROM orderFinish";
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -329,12 +441,16 @@ public class HelloController implements Initializable {
                 listZak.add(new ObjectProd(rs.getString(1), rs.getDouble(2), rs.getDouble(3),
                         rs.getBlob(4), rs.getInt(5), rs.getString(6)));
             }
+            ResultSet resultSet1 = statement.executeQuery(queryOrder);
+            while (resultSet1.next()) {
+                listOrderFinish.add(new ObjectFinishOrder(resultSet1.getInt(1), resultSet1.getDate(2), resultSet1.getDouble(3),
+                        resultSet1.getDouble(4)));
+            }
         } catch (Exception ex) {
             System.out.println("Connection failed...");
             System.out.println(ex);
         }
     }
-
     @FXML
     protected void bbb() {
         list.clear();
@@ -363,7 +479,6 @@ public class HelloController implements Initializable {
             }
         }
     }
-
     @FXML
     protected void loadProduct() {
 
@@ -421,7 +536,6 @@ public class HelloController implements Initializable {
 
         paneEdit.setDisable(false);
     }
-
     @FXML
     protected void editProdBut() {
         String prodName = null;
@@ -465,8 +579,6 @@ public class HelloController implements Initializable {
             prodPrise = Double.parseDouble(TFeditElemPrise.getText());
             prodKolVo = Integer.parseInt(TFeditElemKolVo.getText());
             prodVid = CBVidProdFromEdit.getValue().toString();
-
-            
 
         } catch (Exception e) {
             System.out.println("Ошибка в записи");
@@ -540,7 +652,6 @@ public class HelloController implements Initializable {
 
         paneEdit.setDisable(true);
     }
-
     @FXML
     protected void deleteBut2() {
 
@@ -574,6 +685,217 @@ public class HelloController implements Initializable {
         }
 
         paneEdit.setDisable(true);
+    }
+    @FXML
+    protected void fillTableOrderBut() {
+        String poduct;
+        int kolVo = Integer.parseInt(tfAddToOrderkolVo.getText());
+        int num = listOrderStruct.size() + 1;
+        LocalDate date = LocalDate.now();
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                poduct = list.get(i).name;
+                if (poduct.equals(nameFromOrder.getText())) {
+                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo,kolVo * list.get(i).prise, date));
+                    fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID, tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
+                    break;
+                }
+            }
+            for (int i = 0; i < listZak.size(); i++) {
+                poduct = listZak.get(i).name;
+                if (poduct.equals(nameFromOrder.getText())) {
+                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo, kolVo * listZak.get(i).prise, date));
+                    fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID, tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
+                    break;
+                }
+            }
+        } catch (Exception ignored) {}
+
+
+    }
+    @FXML
+    protected void delToMenuBut(){
+
+        int idTime = Integer.parseInt(tfIDdelite.getText());
+        listOrderStruct.remove(idTime - 1);
+        while (idTime < listOrderStruct.size() + 1){
+            int idNew = idTime - 1;
+            listOrderStruct.set(idTime - 1, new ObjectOrder(idTime, listOrderStruct.get(idNew).name, listOrderStruct.get(idNew).kolVo,listOrderStruct.get(idNew).prise,listOrderStruct.get(idNew).date));
+            idTime++;
+        }
+
+        fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID ,tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
+
+    }
+
+    public void finishOrderAddElem(){
+        int num = listOrderFinish.size() + 1;
+        double priseGet = 0;
+        double priseMid = 0;
+        java.util.Date dt = new java.util.Date();
+        Date date = new Date(dt.getTime());
+        try {
+            for (int i = 0; i < listOrderStruct.size(); i++) {
+                priseGet = priseGet + listOrderStruct.get(i).prise;
+            }
+            priseMid = priseGet/listOrderStruct.size();;
+
+            listOrderFinish.add(new ObjectFinishOrder(num, date, priseMid, priseGet));
+            fillTableOrderFinish(listOrderFinish, tbViewFinish, tbNumOrder, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
+        } catch (Exception ignored) {}
+
+    }
+    @FXML
+    protected void updateOrderTable(){
+        fillOrderTableToSql();
+    }
+
+    public void fillOrderTableToSql(){
+        try {
+            String quary = "DELETE FROM orderFinish;";
+            PreparedStatement preparedStatement = connection.prepareStatement(quary);
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
+
+        String lastName = null;
+        double prodSize = 0;
+        double prodPrise = 0;
+        int prodKolVo = 0;
+        Blob imageProd = null;
+        String prodVid = null;
+        String tableName = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            for(int i = 0; i < list.size(); i++){
+                for (int j = 0; j< listOrderStruct.size(); j++) {
+                    if(list.get(i).name.equals(listOrderStruct.get(j).name)){
+                        lastName = list.get(i).name;
+                        imageProd = list.get(i).image;
+                        prodSize = list.get(i).size;
+                        prodPrise = list.get(i).prise;
+                        prodKolVo = list.get(i).kolVo - listOrderStruct.get(j).kolVo;
+                        prodVid = list.get(i).vid;
+                        tableName = "ProductNap";
+
+                        try {
+                            String quary = "UPDATE " + tableName + " SET nameNap = ?, sizeNap = ?, priseNap = ?, " +
+                                        "imageNap = ?, kolvo = ?, vidNap = ?  WHERE nameNap = '" + lastName + "'";
+                            preparedStatement = connection.prepareStatement(quary);
+                            preparedStatement.setString(1, lastName);
+                            preparedStatement.setDouble(2, prodSize);
+                            preparedStatement.setDouble(3, prodPrise);
+                            preparedStatement.setBlob(4, imageProd);
+                            preparedStatement.setInt(5, prodKolVo);
+                            preparedStatement.setString(6, prodVid);
+
+                            try {
+                                int rows = preparedStatement.executeUpdate();
+                                list.clear();
+                                listZak.clear();
+                                uploadElements();
+
+                            } catch (SQLException e) {
+                                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Не хватает товара");
+                                alert.showAndWait();
+                            }
+                            if (prodKolVo > 0) {
+                                ccc(j);
+                                finishOrderAddElem();
+                                fillTableOrderFinishToSql();
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("Неуспешно");
+                            printSQLException(e);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) { }
+
+        try {
+            for(int i = 0; i < listZak.size(); i++){
+                for (int j = 0; j< listOrderStruct.size(); j++) {
+                    if(listZak.get(i).name.equals(listOrderStruct.get(j).name)){
+                        lastName = listZak.get(i).name;
+                        imageProd = listZak.get(i).image;
+                        prodSize = listZak.get(i).size;
+                        prodPrise = listZak.get(i).prise;
+                        prodKolVo = listZak.get(i).kolVo - listOrderStruct.get(j).kolVo;
+                        prodVid = listZak.get(i).vid;
+                        tableName = "ProductZak";
+
+                        try {
+                            String quary2 = "UPDATE " + tableName + " SET nameZak = ?, sizeZak = ?, priseZak = ?," +
+                                        " imageZak = ?, kolvoZak = ?, vidZak = ?  WHERE nameZak = '" + lastName + "'";
+                            preparedStatement = connection.prepareStatement(quary2);
+                            preparedStatement.setString(1, lastName);
+                            preparedStatement.setDouble(2, prodSize);
+                            preparedStatement.setDouble(3, prodPrise);
+                            preparedStatement.setBlob(4, imageProd);
+                            preparedStatement.setInt(5, prodKolVo);
+                            preparedStatement.setString(6, prodVid);
+
+                            try {
+                                int rows = preparedStatement.executeUpdate();
+                                list.clear();
+                                listZak.clear();
+                                uploadElements();
+                            } catch (SQLException e) {
+                                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Не хватает товара");
+                                alert.showAndWait();
+                            }
+                            if (prodKolVo>0) {
+                                ccc(j);
+                                finishOrderAddElem();
+                                fillTableOrderFinishToSql();
+                            }
+                        } catch (SQLException e) {
+                            System.out.println("Неуспешно");
+                            printSQLException(e);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) { }
+
+
+    }
+    public void ccc(int j){
+        int idOrderProd = 0;
+        String nameOrderProd = null;
+        int kolVoOrderProd = 0;
+        double priseOrderProd = 0;
+        LocalDate dateOrderProd = null;
+            try {
+                idOrderProd = listOrderStruct.get(j).id;
+                nameOrderProd = listOrderStruct.get(j).name;
+                kolVoOrderProd = listOrderStruct.get(j).kolVo;
+                priseOrderProd = listOrderStruct.get(j).prise;
+                dateOrderProd = listOrderStruct.get(j).date;
+            } catch (Exception e) {
+                System.out.println("Ошибка в записи");
+            }
+            try {
+                String quary = "insert orderStructure values (?,?,?,?,?);";
+                PreparedStatement preparedStatement1 = connection.prepareStatement(quary);
+                preparedStatement1.setInt(1, idOrderProd);
+                preparedStatement1.setString(2, nameOrderProd);
+                preparedStatement1.setDouble(3, priseOrderProd);
+                preparedStatement1.setInt(4, kolVoOrderProd);
+                preparedStatement1.setDate(5, Date.valueOf(dateOrderProd));
+
+                int rows = preparedStatement1.executeUpdate();
+
+            } catch (SQLException e) {
+                System.out.println("Неуспешно");
+                printSQLException(e);
+            }
+
     }
 
     //region StyleButton
@@ -677,6 +999,68 @@ public class HelloController implements Initializable {
     //endregion
 
     //region Не трогать
+    public void fillTable(ObservableList obslist,TableView tableView,TableColumn tableColumnId,TableColumn tableColumnName,
+                          TableColumn tableColumnKolVo,TableColumn tableColumnPrise){
+        try {
+            tableColumnId.setCellValueFactory(new PropertyValueFactory<ObjectOrder, String>("Id"));
+            tableColumnName.setCellValueFactory(new PropertyValueFactory<ObjectOrder, String>("Name"));
+            tableColumnPrise.setCellValueFactory(new PropertyValueFactory<ObjectOrder, Integer>("Prise"));
+            tableColumnKolVo.setCellValueFactory(new PropertyValueFactory<ObjectOrder, Integer>("KolVo"));
+
+            tableView.setItems(obslist);
+        } catch (Exception e) {
+            System.out.println("Ошибка");
+        }
+    }
+    public void fillTableOrderFinish(ObservableList obslist,TableView tableView,TableColumn tableColumnId,TableColumn tableColumnDate, TableColumn tableColumnPriseMid,
+                          TableColumn tableColumnPriseGen){
+        try {
+            tableColumnId.setCellValueFactory(new PropertyValueFactory<ObjectFinishOrder, Integer>("Id"));
+            tableColumnDate.setCellValueFactory(new PropertyValueFactory<ObjectFinishOrder, Date>("Date"));
+            tableColumnPriseMid.setCellValueFactory(new PropertyValueFactory<ObjectFinishOrder, Double>("PriseMid"));
+            tableColumnPriseGen.setCellValueFactory(new PropertyValueFactory<ObjectFinishOrder, Double>("PriseGen"));
+
+            tableView.setItems(obslist);
+        } catch (Exception e) {
+            System.out.println("Ошибка");
+        }
+
+    }
+
+    public void fillTableOrderFinishToSql(){
+
+        double genPrise = 0;
+        double midPrise = 0;
+        Date date = null;
+
+        PreparedStatement preparedStatement = null;
+        try {
+            for (int i = 0; i < listOrderFinish.size(); i++) {
+
+                genPrise = listOrderFinish.get(i).priseGen;
+                midPrise = listOrderFinish.get(i).priseMid;
+                date = listOrderFinish.get(i).date;
+                try {
+                    String quary = "insert orderFinish values (?,?,?,?);";
+                    preparedStatement = connection.prepareStatement(quary);
+                    preparedStatement.setInt(1, i+1);
+                    preparedStatement.setDate(2, date);
+                    preparedStatement.setDouble(3, midPrise);
+                    preparedStatement.setDouble(4, genPrise);
+
+                    int rows = preparedStatement.executeUpdate();
+
+                } catch (SQLException e) {
+                    System.out.println("Неуспешно");
+                    printSQLException(e);
+                }
+
+
+            }
+        } catch (Exception e) {
+            System.out.println("Неуспешно");
+        }
+    }
     public void fiilGridTable() {
 
         for (int i = 0; i <= 1; i++){
