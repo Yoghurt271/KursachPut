@@ -5,6 +5,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -43,6 +45,7 @@ public class HelloController implements Initializable {
     private Connection connection;
 
     public File selectedFile;
+    LocalDate date;
 
     public static void printSQLException(SQLException ex) {
         for (Throwable e : ex) {
@@ -65,10 +68,19 @@ public class HelloController implements Initializable {
             connection = DriverManager.getConnection(url, user, password);
             System.out.println("Подключение к базе данных успешно установлено!");
             uploadElements();
+            uploadElementsOrder();
+            uploadElementsStrukt();
             fiilGridTable();
             fillCB();
             fillVidForProductCreatePane();
-            fillTableOrderFinish(listOrderFinish, tbViewFinish, tbCollumnID, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
+            fillTableOrderFinish(listOrderFinish, tbViewFinish, tbNumOrder, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
+            date = LocalDate.now();
+            analitPaneDMY.setText(String.valueOf(date));
+            fillRevenue();
+            fillMidChek();
+            fillMaxChek();
+            fillSels();
+            fillChart();
             for (int i = 0; i < listVidNap.size(); i++){
                 CBcreteElemVid.getItems().add(listVidNap.get(i));
             }
@@ -93,11 +105,11 @@ public class HelloController implements Initializable {
             TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap, tfSearchProd,
             tfAddToOrderkolVo, tfIDdelite;
     @FXML
-    private ScrollPane scrolPaneNap, scrolPaneZak;
+    private ScrollPane scrolPaneNap, scrolPaneZak, scrolPaneLider;
     @FXML
     private AnchorPane salePane;
     @FXML
-    private Label resultSearch, nameFromOrder, priseFromOrder, kolVoFromOrder;
+    private Label resultSearch, nameFromOrder, priseFromOrder, kolVoFromOrder, analitPaneDMY, labelRevenue, labelMidChek,labelMaxChek, labelSels;
     @FXML
     private ComboBox ComBox, CBTypeTov, CBProduct, CBcreteElemVid, choiceWhatsCreate,
             CBVidProdFromEdit, VidDeleteEdit, CBTypeTov1, CBsalesPaneType, CBsalesPaneVid, CBsalesPaneProd;
@@ -110,8 +122,13 @@ public class HelloController implements Initializable {
     @FXML
     private TableColumn<ObjectProd,String> tbCollumnName, tbDateAndTimeOrder;
 
+    @FXML
+    private LineChart <?,?> chart;
+
     ArrayList<ObjectProd> list = new ArrayList<ObjectProd>();
     ArrayList<ObjectProd> listZak = new ArrayList<ObjectProd>();
+    ArrayList<ObjectFindLider> listLider = new ArrayList<ObjectFindLider>();
+    ArrayList<ObjectFindLider> listLiderResult = new ArrayList<ObjectFindLider>();
     ArrayList<String> listVidNap = new ArrayList<>();
     ArrayList<String> listVidZak = new ArrayList<>();
     ObservableList<ObjectOrder> listOrderStruct = FXCollections.observableArrayList();
@@ -119,6 +136,84 @@ public class HelloController implements Initializable {
     String name = null;
 
     //endregion
+
+    public void fillChart(){
+        XYChart.Series series = new XYChart.Series<>();
+
+        LocalDate dateSravn = LocalDate.of(2012, 6, 30);
+        LocalDate dateSravn2 = LocalDate.of(2012, 6, 30);
+        double maxChek;
+        double prise;
+        LocalDate dateSravn3 = LocalDate.now().minusDays(5);
+
+        for (int i = 0; i < listOrderFinish.size(); i ++) {
+            maxChek = 0;
+            prise = 0;
+            for (int j = 0; j < listOrderFinish.size(); j++) {
+                dateSravn2 = listOrderFinish.get(i).date;
+                if (dateSravn2.equals(listOrderFinish.get(j).date)) {
+
+                    maxChek = prise + listOrderFinish.get(j).priseGen;;
+
+                }
+            }
+            if (!dateSravn.equals(listOrderFinish.get(i).date) && listOrderFinish.get(i).date.isAfter(dateSravn3)) {
+                series.getData().add(new XYChart.Data(listOrderFinish.get(i).date.toString(), maxChek));
+
+                dateSravn = listOrderFinish.get(i).date;
+            }
+        }
+
+        chart.getData().add(series);
+    }
+
+    public void fillRevenue(){
+        double Revenue = 0;
+        for (int i = 0; i < listOrderFinish.size(); i++){
+            if (listOrderFinish.get(i).date.equals(date)) {
+                Revenue = Revenue + listOrderFinish.get(i).priseGen;
+            }
+        }
+        labelRevenue.setText(String.valueOf(Revenue) + " Р");
+    }
+
+    public void fillMidChek(){
+        double midChek = 0;
+        double genPrise = 0;
+        for (int i = 0; i < listOrderFinish.size(); i++){
+            if (listOrderFinish.get(i).date.equals(date)) {
+                genPrise = genPrise + listOrderFinish.get(i).priseGen;
+            }
+        }
+        midChek = genPrise/listOrderFinish.size();
+        labelMidChek.setText(String.valueOf(midChek) + " Р");
+    }
+
+    public void fillMaxChek(){
+        double maxChek = 0;
+        double prise = 0;
+        for (int i = 0; i < listOrderFinish.size(); i++){
+            if (listOrderFinish.get(i).date.equals(date)) {
+                prise = listOrderFinish.get(i).priseGen;
+                if(prise > maxChek){
+                    maxChek = prise;
+                }
+            }
+        }
+        labelMaxChek.setText(String.valueOf(maxChek) + " Р");
+    }
+
+    public void fillSels(){
+        int num = 0;
+        LocalDate dateSravn = LocalDate.now();
+        for (int i = 0; i < listOrderFinish.size(); i ++) {
+            if (dateSravn.equals(listOrderFinish.get(i).date)) {
+                num = num + 1;
+            }
+        }
+        labelSels.setText(String.valueOf(num));
+    }
+
     @FXML
     protected void SendToServ() {
         String x = String.valueOf(ComBox.getValue());
@@ -424,10 +519,10 @@ public class HelloController implements Initializable {
         }
 
     }
+
     public void uploadElements() {
         String query = "SELECT * FROM ProductNap";
         String queryZak = "SELECT * FROM ProductZak";
-        String queryOrder = "SELECT * FROM orderFinish";
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -441,9 +536,35 @@ public class HelloController implements Initializable {
                 listZak.add(new ObjectProd(rs.getString(1), rs.getDouble(2), rs.getDouble(3),
                         rs.getBlob(4), rs.getInt(5), rs.getString(6)));
             }
+
+        } catch (Exception ex) {
+            System.out.println("Connection failed...");
+            System.out.println(ex);
+        }
+    }
+
+    public void uploadElementsStrukt() {
+        String queryStruct = "SELECT * FROM orderStructure";
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet1 = statement.executeQuery(queryStruct);
+            while (resultSet1.next()) {
+                listOrderStruct.add(new ObjectOrder(resultSet1.getInt(1), resultSet1.getString(2), resultSet1.getDouble(3),
+                        resultSet1.getInt(4), resultSet1.getDate(5).toLocalDate()));
+            }
+        } catch (Exception ex) {
+            System.out.println("Connection failed...");
+            System.out.println(ex);
+        }
+    }
+
+    public void uploadElementsOrder() {
+        String queryOrder = "SELECT * FROM orderFinish";
+        try {
+            Statement statement = connection.createStatement();
             ResultSet resultSet1 = statement.executeQuery(queryOrder);
             while (resultSet1.next()) {
-                listOrderFinish.add(new ObjectFinishOrder(resultSet1.getInt(1), resultSet1.getDate(2), resultSet1.getDouble(3),
+                listOrderFinish.add(new ObjectFinishOrder(resultSet1.getInt(1), resultSet1.getDate(2).toLocalDate(), resultSet1.getDouble(3),
                         resultSet1.getDouble(4)));
             }
         } catch (Exception ex) {
@@ -457,7 +578,13 @@ public class HelloController implements Initializable {
         listZak.clear();
         listVidNap.clear();
         listVidZak.clear();
+        listOrderFinish.clear();
+        listOrderStruct.clear();
+        listLider.clear();
+        listLiderResult.clear();
         uploadElements();
+        uploadElementsOrder();
+        uploadElementsStrukt();
         fiilGridTable();
         choiceFillCB();
         fillVidForProductCreatePane();
@@ -692,11 +819,12 @@ public class HelloController implements Initializable {
         int kolVo = Integer.parseInt(tfAddToOrderkolVo.getText());
         int num = listOrderStruct.size() + 1;
         LocalDate date = LocalDate.now();
+
         try {
             for (int i = 0; i < list.size(); i++) {
                 poduct = list.get(i).name;
                 if (poduct.equals(nameFromOrder.getText())) {
-                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo,kolVo * list.get(i).prise, date));
+                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo * list.get(i).prise , kolVo, date));
                     fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID, tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
                     break;
                 }
@@ -704,7 +832,7 @@ public class HelloController implements Initializable {
             for (int i = 0; i < listZak.size(); i++) {
                 poduct = listZak.get(i).name;
                 if (poduct.equals(nameFromOrder.getText())) {
-                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo, kolVo * listZak.get(i).prise, date));
+                    listOrderStruct.add(new ObjectOrder(num, poduct, kolVo * listZak.get(i).prise, kolVo,  date));
                     fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID, tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
                     break;
                 }
@@ -720,25 +848,22 @@ public class HelloController implements Initializable {
         listOrderStruct.remove(idTime - 1);
         while (idTime < listOrderStruct.size() + 1){
             int idNew = idTime - 1;
-            listOrderStruct.set(idTime - 1, new ObjectOrder(idTime, listOrderStruct.get(idNew).name, listOrderStruct.get(idNew).kolVo,listOrderStruct.get(idNew).prise,listOrderStruct.get(idNew).date));
+            listOrderStruct.set(idTime - 1, new ObjectOrder(idTime, listOrderStruct.get(idNew).name, listOrderStruct.get(idNew).prise, listOrderStruct.get(idNew).kolVo,listOrderStruct.get(idNew).date));
             idTime++;
         }
 
         fillTable(listOrderStruct, tbViewOrderStr,tbCollumnID ,tbCollumnName, tbCollumnKolVo, tbCollumnPrise);
 
     }
-
     public void finishOrderAddElem(){
         int num = listOrderFinish.size() + 1;
         double priseGet = 0;
         double priseMid = 0;
-        java.util.Date dt = new java.util.Date();
-        Date date = new Date(dt.getTime());
         try {
             for (int i = 0; i < listOrderStruct.size(); i++) {
                 priseGet = priseGet + listOrderStruct.get(i).prise;
             }
-            priseMid = priseGet/listOrderStruct.size();;
+            priseMid = priseGet/listOrderStruct.size();
 
             listOrderFinish.add(new ObjectFinishOrder(num, date, priseMid, priseGet));
             fillTableOrderFinish(listOrderFinish, tbViewFinish, tbNumOrder, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
@@ -749,18 +874,7 @@ public class HelloController implements Initializable {
     protected void updateOrderTable(){
         fillOrderTableToSql();
     }
-
     public void fillOrderTableToSql(){
-        try {
-            String quary = "DELETE FROM orderFinish;";
-            PreparedStatement preparedStatement = connection.prepareStatement(quary);
-
-            int rows = preparedStatement.executeUpdate();
-            System.out.println("Успешно");
-        } catch (SQLException e) {
-            System.out.println("Неуспешно");
-            printSQLException(e);
-        }
 
         String lastName = null;
         double prodSize = 0;
@@ -770,8 +884,10 @@ public class HelloController implements Initializable {
         String prodVid = null;
         String tableName = null;
         PreparedStatement preparedStatement = null;
+        int b = 0;
         try {
             for(int i = 0; i < list.size(); i++){
+                b = 0;
                 for (int j = 0; j< listOrderStruct.size(); j++) {
                     if(list.get(i).name.equals(listOrderStruct.get(j).name)){
                         lastName = list.get(i).name;
@@ -802,11 +918,10 @@ public class HelloController implements Initializable {
                             } catch (SQLException e) {
                                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Не хватает товара");
                                 alert.showAndWait();
+                                b = 1;
                             }
-                            if (prodKolVo > 0) {
+                            if (prodKolVo > 0 && b == 0) {
                                 ccc(j);
-                                finishOrderAddElem();
-                                fillTableOrderFinishToSql();
                             }
                         } catch (SQLException e) {
                             System.out.println("Неуспешно");
@@ -815,10 +930,12 @@ public class HelloController implements Initializable {
                     }
                 }
             }
+
         } catch (Exception ignored) { }
 
         try {
             for(int i = 0; i < listZak.size(); i++){
+                b = 0;
                 for (int j = 0; j< listOrderStruct.size(); j++) {
                     if(listZak.get(i).name.equals(listOrderStruct.get(j).name)){
                         lastName = listZak.get(i).name;
@@ -848,11 +965,10 @@ public class HelloController implements Initializable {
                             } catch (SQLException e) {
                                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Не хватает товара");
                                 alert.showAndWait();
+                                b = 1;
                             }
-                            if (prodKolVo>0) {
+                            if (prodKolVo>0 && b == 0) {
                                 ccc(j);
-                                finishOrderAddElem();
-                                fillTableOrderFinishToSql();
                             }
                         } catch (SQLException e) {
                             System.out.println("Неуспешно");
@@ -861,7 +977,42 @@ public class HelloController implements Initializable {
                     }
                 }
             }
+            if (prodKolVo>0 && b == 0) {
+                try {
+
+                    String quary = "DELETE FROM orderFinish;";
+                    preparedStatement = connection.prepareStatement(quary);
+
+                    int rows = preparedStatement.executeUpdate();
+                } catch (SQLException e) {
+                    System.out.println("Неуспешно");
+                    printSQLException(e);
+                }
+                finishOrderAddElem();
+                fillTableOrderFinishToSql();
+                listOrderFinish.clear();
+                uploadElementsOrder();
+                fillTableOrderFinish(listOrderFinish, tbViewFinish ,tbNumOrder, tbDateAndTimeOrder, tbMidPriseOrder, tbGenPrise);
+                fillRevenue();
+                fillMidChek();
+                fillSels();
+                fillMaxChek();
+                chart.getData().clear();
+                fillChart();
+            }
         } catch (Exception ignored) { }
+
+        try {
+
+            String quary = "DELETE FROM orderStructure WHERE nowDate !='"+date+"';";
+            preparedStatement = connection.prepareStatement(quary);
+
+            int rows = preparedStatement.executeUpdate();
+            System.out.println("Успешно");
+        } catch (SQLException e) {
+            System.out.println("Неуспешно");
+            printSQLException(e);
+        }
 
 
     }
@@ -895,6 +1046,47 @@ public class HelloController implements Initializable {
                 System.out.println("Неуспешно");
                 printSQLException(e);
             }
+
+    }
+
+    public void loadLider() {
+        try {
+            String nameFind = "asd";
+            listOrderStruct.sort(Comparator.comparing(ObjectOrder::getName).reversed());
+            for (int i = 0; i < listOrderStruct.size(); i++) {
+                int kolVo = 0;
+                int z = 0;
+                while (z < listOrderStruct.size()) {
+
+                    if (listOrderStruct.get(i).name.equals(listOrderStruct.get(z).name)) {
+                        kolVo = kolVo + listOrderStruct.get(z).kolVo;
+                    }
+                    z++;
+                }
+
+                if (!nameFind.equals(listOrderStruct.get(i).name)) {
+                    nameFind = listOrderStruct.get(i).name;
+
+                    for (int j = 0; j < list.size(); j++) {
+                        if (listOrderStruct.get(i).name.equals(list.get(j).name)) {
+
+                            listLider.add(new ObjectFindLider(nameFind, list.get(j).prise, list.get(j).image, kolVo));
+
+                        }
+                    }
+                    for (int j = 0; j < listZak.size(); j++) {
+                        if (listOrderStruct.get(i).name.equals(listZak.get(j).name)) {
+
+                            listLider.add(new ObjectFindLider(nameFind, listZak.get(j).prise, listZak.get(j).image, kolVo));
+
+                        }
+                    }
+
+                }
+
+            }
+        } catch (Exception ignored) {
+        }
 
     }
 
@@ -961,6 +1153,7 @@ public class HelloController implements Initializable {
         comapny.setVisible(false);
         CreateElemPane.setVisible(false);
         changePane.setVisible(false);
+        listOrderStruct.clear();
     }
 
     @FXML
@@ -1031,7 +1224,7 @@ public class HelloController implements Initializable {
 
         double genPrise = 0;
         double midPrise = 0;
-        Date date = null;
+
 
         PreparedStatement preparedStatement = null;
         try {
@@ -1044,7 +1237,7 @@ public class HelloController implements Initializable {
                     String quary = "insert orderFinish values (?,?,?,?);";
                     preparedStatement = connection.prepareStatement(quary);
                     preparedStatement.setInt(1, i+1);
-                    preparedStatement.setDate(2, date);
+                    preparedStatement.setDate(2, Date.valueOf(date));
                     preparedStatement.setDouble(3, midPrise);
                     preparedStatement.setDouble(4, genPrise);
 
@@ -1057,6 +1250,7 @@ public class HelloController implements Initializable {
 
 
             }
+
         } catch (Exception e) {
             System.out.println("Неуспешно");
         }
@@ -1069,9 +1263,108 @@ public class HelloController implements Initializable {
             }else {
                 scrolPaneZak.setContent(fillTableNapAndZak(listZak,"Вес в кг: "));
             }
+
+        }
+        scrolPaneLider.setContent(fillLiderSels());
+
+    }
+
+    public GridPane fillLiderSels(){
+        GridPane gridPane = new GridPane();
+        gridPane.getChildren().clear();
+        gridPane.setPrefSize(978, 400);
+
+        int j = 0;
+        int k = 0;
+        int b = 978;
+
+        String nameFind = null;
+
+        String name = null;
+        int kolVo = 0;
+        double prise = 0;
+        Blob image = null;
+        loadLider();
+        for (int i = 0; i < listLider.size(); i++) {
+                name = listLider.get(i).name;
+                prise = listLider.get(i).prise;
+                image = listLider.get(i).image;
+
+                kolVo = listLider.get(i).kolVo;
+
+
+                listLiderResult.add(new ObjectFindLider(name,prise,image,kolVo));
+
         }
 
 
+        listLiderResult.sort(Comparator.comparing(ObjectFindLider::getKolVo).reversed());
+        for (int i = 1; i <= listLiderResult.size(); i++) {
+
+            Pane paneBack = new Pane();
+            paneBack.setPrefSize(247, 307);
+
+            Pane paneMain = new Pane();
+            paneMain.setPrefSize(232, 289);
+            paneMain.setLayoutY(60);
+            paneMain.setLayoutX(16);
+            paneMain.setStyle(
+                    "-fx-padding: 0;" +
+                            "-fx-background-color: #E0E0E0;" +
+                            "-fx-border-color: #CFCFCF;"
+            );
+
+            Label nameNap = new Label();
+            nameNap.setPrefSize(208, 30);
+            nameNap.setStyle("-fx-font-size: 20px;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            nameNap.setText(listLiderResult.get(i - 1).name);
+            nameNap.setLayoutX(10);
+            nameNap.setLayoutY(185);
+
+            Label priseNap = new Label();
+            priseNap.setPrefSize(191, 27);
+            priseNap.setStyle("-fx-font-size: 18px;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            priseNap.setText("Цена: " + listLiderResult.get(i - 1).prise);
+            priseNap.setLayoutX(20);
+            priseNap.setLayoutY(250);
+
+            Label kolVoNap = new Label();
+            kolVoNap.setPrefSize(191, 27);
+            kolVoNap.setStyle("-fx-font-size: 16px;" +
+                    "-fx-alignment: BOTTOM_CENTER;");
+            kolVoNap.setText("Количество покупок: " + listLiderResult.get(i - 1).kolVo);
+            kolVoNap.setLayoutX(20);
+            kolVoNap.setLayoutY(220);
+
+            StackPane paneForImage = new StackPane();
+            paneForImage.setPrefSize(244,174);
+
+            ImageView imView = new ImageView(decodeImage(listLiderResult.get(i - 1).image));
+            imView.setPreserveRatio(true);
+            imView.setFitWidth(244);
+            imView.setFitHeight(174);
+
+            paneForImage.getChildren().add(imView);
+            StackPane.setAlignment(imView, Pos.TOP_CENTER);
+
+            paneMain.getChildren().addAll(nameNap, priseNap, paneForImage, kolVoNap);
+
+            paneBack.getChildren().add(paneMain);
+
+            if (i % 5 != 0) {
+                gridPane.add(paneBack, k, j);
+                k++;
+            } else {
+
+                gridPane.setPrefSize(978 + b, 400);
+                gridPane.add(paneBack, k, j);
+                b = b + 978;
+                k++;
+            }
+        }
+        return gridPane;
     }
 
     public GridPane fillTableNapAndZak(List listForChoice, String sizeNapOrZak){

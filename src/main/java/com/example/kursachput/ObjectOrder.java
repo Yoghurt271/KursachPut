@@ -6,16 +6,14 @@ import java.util.Date;
 public class ObjectOrder {
 
     int id;
-    LocalDate date;
+
     String name;
     double prise;
     int kolVo;
+    LocalDate date;
 
     public void setId(int id) {
         this.id = id;
-    }
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
     public void setName(String name) {
         this.name = name;
@@ -24,9 +22,11 @@ public class ObjectOrder {
         this.prise = prise;
     }
     public void setKolVo(int kolVo) { this.kolVo = kolVo; }
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
 
     public int getId() { return id; }
-    public LocalDate getDate() { return date; }
     public String getName() {
         return name;
     }
@@ -36,13 +36,14 @@ public class ObjectOrder {
     public int getKolVo() {
         return kolVo;
     }
+    public LocalDate getDate() { return date; }
 
 
-    public ObjectOrder(int id,String name, int kolVo, double prise, LocalDate date){
+    public ObjectOrder(int id,String name, double prise,int kolVo,  LocalDate date){
         this.id = id;
         this.name = name;
-        this.kolVo = kolVo;
         this.prise = prise;
+        this.kolVo = kolVo;
         this.date = date;
 
     }

@@ -6,14 +6,14 @@ import java.util.Date;
 public class ObjectFinishOrder {
 
     int id;
-    java.sql.Date date;
+    LocalDate date;
     double priseMid;
     double priseGen;
 
     public void setId(int id) {
         this.id = id;
     }
-    public void setDate(java.sql.Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
     public void setPriseMid(double priseMid) {
@@ -22,7 +22,7 @@ public class ObjectFinishOrder {
     public void setPriseGen(double priseGen) { this.priseGen = priseGen; }
 
     public int getId() { return id; }
-    public Date getDate() { return date; }
+    public LocalDate getDate() { return date; }
     public double getPriseMid() {
         return priseMid;
     }
@@ -31,7 +31,7 @@ public class ObjectFinishOrder {
     }
 
 
-    public ObjectFinishOrder(int id, java.sql.Date date, double priseMid, double priseGen){
+    public ObjectFinishOrder(int id, LocalDate date, double priseMid, double priseGen){
         this.id = id;
         this.date = date;
         this.priseMid = priseMid;
