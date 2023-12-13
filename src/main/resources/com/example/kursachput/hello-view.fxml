@@ -219,12 +219,12 @@
                         <Insets left="1.0" right="1.0" />
                      </padding>
                   </Pane>
-                  <AnchorPane fx:id="salePane" prefHeight="781.0" prefWidth="1044.0" visible="false">
+                  <AnchorPane fx:id="salePane" prefHeight="781.0" prefWidth="1044.0">
                      <children>
                         <Pane layoutY="342.0" prefHeight="439.0" prefWidth="1051.0">
                            <children>
-                              <Label fx:id="tbViewFinishOrder" layoutX="14.0" layoutY="14.0" text="Завершенные заказы" />
-                              <TableView fx:id="tbViewFinish" layoutX="16.0" layoutY="35.0" prefHeight="397.0" prefWidth="1016.0">
+                              <Label fx:id="tbViewFinishOrder" layoutX="16.0" layoutY="14.0" text="Завершенные заказы" />
+                              <TableView fx:id="tbViewFinish" layoutX="16.0" layoutY="45.0" prefHeight="387.0" prefWidth="1016.0">
                                 <columns>
                                   <TableColumn fx:id="tbNumOrder" prefWidth="102.0" text="№Заказа" />
                                   <TableColumn fx:id="tbDateAndTimeOrder" prefWidth="176.0" text="Дата" />
@@ -235,6 +235,8 @@
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                  </columnResizePolicy>
                               </TableView>
+                              <Button layoutX="874.0" layoutY="10.0" mnemonicParsing="false" onAction="#CreateExcel" prefHeight="25.0" prefWidth="158.0" text="Напечатать" />
+                              <TextField fx:id="nameExelFile" layoutX="711.0" layoutY="10.0" promptText="Имя файла" />
                            </children>
                         </Pane>
                         <Pane layoutX="16.0" layoutY="14.0" prefHeight="328.0" prefWidth="489.0">
@@ -308,7 +310,7 @@
                         </Pane>
                      </children>
                   </AnchorPane>
-                  <Pane fx:id="comapny" layoutX="-5.0" prefHeight="789.0" prefWidth="1053.0">
+                  <Pane fx:id="comapny" layoutX="-5.0" prefHeight="789.0" prefWidth="1053.0" visible="false">
                      <children>
                         <Pane layoutX="15.0" layoutY="7.0" prefHeight="139.0" prefWidth="1030.0" style="-fx-border-color: #CFCFCF; -fx-background-color: #F5F5F5;">
                            <children>

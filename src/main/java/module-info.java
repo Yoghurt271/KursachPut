@@ -3,6 +3,7 @@ module com.example.kursachput {
     requires javafx.fxml;
     requires java.sql;
     requires java.desktop;
+    requires org.apache.poi.poi;
 
 
     opens com.example.kursachput to javafx.fxml;

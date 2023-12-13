@@ -15,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -30,6 +31,9 @@ import java.util.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import javax.imageio.ImageIO;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.sql.Connection;
 
@@ -102,7 +106,7 @@ public class HelloController implements Initializable {
     private ImageView imageCreatePane, imageEditPane, imgAddFromOrder;
     @FXML
     private TextField TFcreateElemName, TFcreateElemSize, TFcreateElemPrise, TFcreateElemKolVo,
-            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap, tfSearchProd,
+            TFeditElemName, TFeditElemSize, TFeditElemPrise, TFeditElemKolVo,TFCreateVidNap, tfSearchProd, nameExelFile,
             tfAddToOrderkolVo, tfIDdelite;
     @FXML
     private ScrollPane scrolPaneNap, scrolPaneZak, scrolPaneLider;
@@ -1525,5 +1529,47 @@ public class HelloController implements Initializable {
             imageViewEdit.setY((imageViewEdit.getFitHeight() - h) / 2);
         }
     }
+
+    @FXML
+    public void CreateExcel() {
+            try {
+                String name = nameExelFile.getText();
+                if (name.equals("")){
+                    name = "Отчет";
+                }
+                DirectoryChooser directoryChooser = new DirectoryChooser();
+                directoryChooser.setTitle("Создание Excel");
+                String direct = directoryChooser.showDialog(null).toString();
+                String path = direct + "\\"+name+".xls";
+
+                HSSFWorkbook workbook = new HSSFWorkbook();
+                HSSFSheet sheet = workbook.createSheet("Лист1");
+
+                HSSFRow rowhead = sheet.createRow((short) 0);
+                rowhead.createCell(0).setCellValue("Номер");
+                rowhead.createCell(1).setCellValue("Дата");
+                rowhead.createCell(2).setCellValue("Средняя цена");
+                rowhead.createCell(3).setCellValue("Общая стоимость");
+
+                int j = 1;
+                for (int i = 0; i < listOrderFinish.size(); i++) {
+                    HSSFRow row = sheet.createRow((short) j);
+                    row.createCell(0).setCellValue(listOrderFinish.get(i).id);
+                    row.createCell(1).setCellValue(listOrderFinish.get(i).date.toString());
+                    row.createCell(2).setCellValue(listOrderFinish.get(i).priseMid + " Р");
+                    row.createCell(3).setCellValue(listOrderFinish.get(i).priseGen + " Р");
+                    j++;
+                }
+
+                FileOutputStream fileOut = new FileOutputStream(path);
+                workbook.write(fileOut);
+                fileOut.close();
+                workbook.close();
+
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+        }
+
     //endregion
 }
